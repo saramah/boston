@@ -21,10 +21,8 @@ last = ""
 line_number = 0
 
 
-try:
-    file = open("sample_1955.txt")
-    for line in file:
-        line_number = line_number + 1
+with open("sample_1955.txt") as infile:
+    for line_number, line in enumerate(infile):
         if line.isupper():
             last = line.strip().capitalize()
             continue
@@ -34,9 +32,6 @@ try:
         #error'd line
         else:
             errors.append(str(line_number) + " " + line.strip())
-    file.close()
-except IOError:
-    print "gah!"
 
 print lines
 print "ERROR'D"
