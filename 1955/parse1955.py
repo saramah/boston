@@ -28,11 +28,12 @@ class Company(object):
     def __str__(self):
         return self.name
 
-def build_dictionaries(dictmap):
-    for f in dictmap.keys():
-        with open(f) as infile:
-            for line in infile:
-                dictmap[f].append(line.strip())
+def build_dictionary(path):
+    dict = {}
+    with open(path) as infile:
+        for line in infile:
+            dict[line.strip()] = True
+    return dict
     
 
 lines, errors = [], []
@@ -42,15 +43,11 @@ line_number = 0
 #####build dictionaries
 #last names, male/female first names, streets, neighborhoods
 #neighborhood abbreviations, name abbreviations
-lnames, mnames, fnames, streets, nhoods = [], [], [], [], []
-
-dicts = {"../dict/boston-streets.txt": streets,
-         "../dict/lastnames.txt": lnames,
-         "../dict/mfirst.txt": mnames,
-         "../dict/ffirst.txt": fnames,
-         "../dict/neighborhoods.txt": nhoods}
-
-build_dictionaries(dicts)
+lnames = build_dictionary("../dict/lastnames.txt")
+mnames = build_dictionary("../dict/mfirst.txt")
+fnames = build_dictionary("../dict/ffirst.txt")
+streets = build_dictionary("../dict/boston-streets.txt")
+nhoods = build_dictionary("../dict/neighborhoods.txt")
 
 print nhoods
 sys.exit()
@@ -89,7 +86,7 @@ with open("sample_1955.txt") as infile:
         elif line[0].isupper():
             last = line[0].strip().capitalize()
         #singleton last name/alt multiple lastname, first entry
-        elif lnames.__contains__(line[0]):
+        elif lnames[line[0]]:
             last = line[0]
             first = nameabbr[line[1]] or line[1]
             if len(first) is 1 or len(line[2]) is 1:
