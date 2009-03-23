@@ -29,11 +29,15 @@ class Company(object):
         return self.name
 
 def build_dictionary(path):
-    dict = {}
+    build = {}
     with open(path) as infile:
         for line in infile:
-            dict[line.strip()] = True
-    return dict
+            line = line.split()
+            val = True
+            if len(line) > 1:
+                val = line[1].strip()
+            build[line[0].strip()] = val
+    return build
     
 
 lines, errors = [], []
@@ -48,23 +52,11 @@ mnames = build_dictionary("../dict/mfirst.txt")
 fnames = build_dictionary("../dict/ffirst.txt")
 streets = build_dictionary("../dict/boston-streets.txt")
 nhoods = build_dictionary("../dict/neighborhoods.txt")
+nameabbr = build_dictionary("../dict/firstabbr.txt")
+neighabbr = build_dictionary("../dict/neighabbr.txt")
 
-print nhoods
+print neighabbr
 sys.exit()
-
-nameabbr = {}
-with open("../dict/firstabbr.txt") as infile:
-    for line in enumerate(infile):
-        pair = line[1].strip().split()
-        key, value = pair[0], pair[1]
-        nameabbr[key] = value
-
-neighabbr = {}
-with open("../dict/neighabbr.txt") as infile:
-    for line in enumerate(infile):
-        pair = line[1].strip().split()
-        key, value = pair[0], pair[1]
-        neighabbr[key] = value
 
 #####the actual parsing
 with open("sample_1955.txt") as infile:
