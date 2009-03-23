@@ -7,23 +7,23 @@ import sys
 
 class Person(object):
     def __init__(self, first, last, spouse, prof, number, street, nh):
-        first = self.first
-        last = self.last
-        spouse = self.spouse
-        prof = self.prof
-        number = self.number
-        street = self.street
-        neighborhood = self.nh
+        self.first = first
+        self.last = last
+        self.spouse = spouse
+        self.prof = prof
+        self.number = number
+        self.street = street
+        self.neighborhood = nh
 
     def __str__(self):
         return self.first + " " + self.last
 
 class Company(object):
     def __init__(self, name, number, street, nh):
-        name = self.name
-        number = self.number
-        street = self.street
-        neighborhood = self.nh
+        self.name = name
+        self.number = number
+        self.street = street
+        self.neighborhood = nh
 
     def __str__(self):
         return self.name
