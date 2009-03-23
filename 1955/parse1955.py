@@ -3,6 +3,7 @@
 # [lastname] firstname [initial] [(wifename)] [profession] [marital status] number streetname [neighborhood]
 # 
 
+import sys
 
 class Person(object):
     def __init__(self, first, last, spouse, prof, number, street, nh):
@@ -27,29 +28,32 @@ class Company(object):
     def __str__(self):
         return self.name
 
-lines = []
-errors = []
-last = ""
+def build_dictionaries(dictmap):
+    for f in dictmap.keys():
+        with open(f) as infile:
+            for line in infile:
+                dictmap[f].append(line.strip())
+    
+
+lines, errors = [], []
+last, prev_line = "", ""
 line_number = 0
-prev_line = ""
 
 #####build dictionaries
 #last names, male/female first names, streets, neighborhoods
 #neighborhood abbreviations, name abbreviations
-lnames = []
-with open("../dict/lastnames.txt") as infile:
-    for line in enumerate(infile):
-        lnames.append(line[1].strip())
+lnames, mnames, fnames, streets, nhoods = [], [], [], [], []
 
-mnames = []
-with open("../dict/mfirst.txt") as infile:
-    for line in enumerate(infile):
-        mnames.append(line[1].strip())
+dicts = {"../dict/boston-streets.txt": streets,
+         "../dict/lastnames.txt": lnames,
+         "../dict/mfirst.txt": mnames,
+         "../dict/ffirst.txt": fnames,
+         "../dict/neighborhoods.txt": nhoods}
 
-fnames = []
-with open("../dict/ffirst.txt") as infile:
-    for line in enumerate(infile):
-        fnames.append(line[1].strip())
+build_dictionaries(dicts)
+
+print nhoods
+sys.exit()
 
 nameabbr = {}
 with open("../dict/firstabbr.txt") as infile:
@@ -57,16 +61,6 @@ with open("../dict/firstabbr.txt") as infile:
         pair = line[1].strip().split()
         key, value = pair[0], pair[1]
         nameabbr[key] = value
-
-streets = []
-with open("../dict/boston-streets.txt") as infile:
-    for line in enumerate(infile):
-        streets.append(line[1].strip())
-
-nhoods = []
-with open("../dict/neighborhoods.txt") as infile:
-    for line in enumerate(infile):
-        nhoods.append(line[1].strip())
 
 neighabbr = {}
 with open("../dict/neighabbr.txt") as infile:
