@@ -5,29 +5,6 @@
 
 import sys
 
-class Person(object):
-    def __init__(self, first, last, spouse, prof, number, street, nh):
-        self.first = first
-        self.last = last
-        self.spouse = spouse
-        self.prof = prof
-        self.number = number
-        self.street = street
-        self.neighborhood = nh
-
-    def __str__(self):
-        return self.first + " " + self.last
-
-class Company(object):
-    def __init__(self, name, number, street, nh):
-        self.name = name
-        self.number = number
-        self.street = street
-        self.neighborhood = nh
-
-    def __str__(self):
-        return self.name
-
 def build_dictionary(path):
     build = {}
     with open(path) as infile:
@@ -35,7 +12,7 @@ def build_dictionary(path):
             line = line.split()
             val = True
             if len(line) > 1:
-                val = line[1].strip()
+                val = " ".join(line[1:]).strip()
             build[line[0].strip()] = val
     return build
     
@@ -57,6 +34,15 @@ neighabbr = build_dictionary("../dict/neighabbr.txt")
 
 print neighabbr
 sys.exit()
+
+with open("sample_1955.txt") as infile:
+    for line_number, line in enumerate(infile):
+        for chomp in line.split():
+            if chomp.startswith("\x97"):
+                first = chomp[4:].capitalize()
+                
+
+
 
 #####the actual parsing
 with open("sample_1955.txt") as infile:
