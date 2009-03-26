@@ -38,7 +38,7 @@ nameabbr = build_dictionary("../dict/firstabbr.txt")
 strabbr = build_dictionary("../dict/strabbr.txt")
 neighabbr = build_dictionary("../dict/neighabbr.txt")
 
-lines, errors, died = {}, [], []
+lines, errors, died = [], [], []
 
 #useful constants
 pattern = r'\bdied\b'
@@ -134,7 +134,10 @@ with open("sample_1955.txt") as infile:
                 #is in Boston proper
                 except KeyError:
                     entry["nh"] = "Boston"
-        except StopIteration: pass 
+        except StopIteration:  
+            pass
+        lines.append("%d %s" % (line_number, entry))
+
 print lines
 print "ERROR'D"
 for xx in errors:
