@@ -41,7 +41,7 @@ DESIRED OUTPUT FROM SAMPLE
  '241 Meridian St, East Boston':{'last':'Colucci',
  'first':'Arthur P', 'spouse':'Sally M', 'prof':'clo cln',
  'empaddr':'241 Meridian EB', 'marital':'h', 'number':'6',
- 'street':'Everett', 'nh':'Dorchester'
+ 'street':'Everett', 'nh':'Dorchester'},
  ...
  ...etc.}
 
