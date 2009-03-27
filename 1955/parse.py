@@ -47,10 +47,11 @@ fir = 1 #firstname
 ini = 2 #initial
 spo = 3 #spouse
 pro = 4 #profession
-mar = 5 #marital status: r, h, wid
-num = 6 #house number
-st = 7 #street name
-nei = 8 #neighborhood
+mar = 5 #wid
+own = 6 #house ownership status
+num = 7 #house number
+st = 8 #street name
+nei = 9 #neighborhood
 
 
 with open("sample_1955.txt") as infile:
@@ -92,8 +93,12 @@ with open("sample_1955.txt") as infile:
                     entry["first"] = first
                 entry["last"] = last_name
                 last_chomp = fir
+            #at the moment, we're not handling continued lines, 
+            #which is more than half of the errors list
             if last_chomp is -1:
+#DEBUG                lines.append("%d %s" % (line_number, line.strip()))
                 errors.append("%d %s UNHANDLED PREFIX" % (line_number, line.strip()))
+                continue
             #2nd bit on line
             #   -first name
             #   -initial, part of first name
@@ -103,7 +108,8 @@ with open("sample_1955.txt") as infile:
             #   
             chomp = lineiter.next()
 
-            #last thing we saw was a last name
+            #if the last thing we saw was a lastname,
+            #then the next thing must be a firstname
             if last_chomp is las:
                 first = chomp.capitalize()
                 if first in nameabbr:
@@ -114,6 +120,50 @@ with open("sample_1955.txt") as infile:
                     errors.append("%d %s NO NAME" % (line_number, line.strip()))
                     continue
                 last_chomp = fir
+            #if the last thing we say was a firstname, 
+            #next could be one of five things:
+            #   -spouse name
+            #   -profession
+            #   -initial
+            #   -own/rent ('r'enter, 'h'ouseholder)
+            #   -"Mrs"
+            elif last_chomp is fir:
+                #spouse name XXX not showing up
+                if chomp.startswith("("):
+                    if chomp.strip("()") not in fnames:
+                        errors.append("%d %s UNKNOWN SPOUSE NAME" % (line_number, line.strip()))
+                        continue
+                    if not chomp.endswith(")"):
+                        initial = lineiter.next()
+                        chomp = chomp + " " + initial
+                    entry["spouse"] = chomp.strip("()")
+                    last_chomp = spo
+                #either profession, marital status, or home status
+                elif chomp.islower():
+                    if chomp is "r":
+                        entry["ownership"] = "renter"
+                        last_chomp = own 
+                    elif chomp is "h":
+                        entry["ownership"] = "owner"
+                        last_chomp = own
+                    elif chomp is "wid":
+                        entry["widowed"] = True
+                        last_chomp = wid
+                    #initial to tack on to first name
+                    elif chomp.isalpha() and len(chomp) is 1:
+                        entry["first"] = entry["first"] + " " + chomp
+                    else:
+                        #TODO: grab professional abbreviations, convert abbr version to
+                        #expanded version
+                        entry["prof"] = chomp
+                        last_chomp = pro
+                elif chomp is "Mrs":
+                    pass
+                else:
+                    errors.append("%d %s UNKNOWN 2nd CHOMP" % (line_number, line.strip()))
+                    continue
+
+                chomp = lineiter.next()
             #neighborhood
 #            try:
  #               entry["nh"] = neighabbr[chomp]
@@ -129,7 +179,9 @@ with open("sample_1955.txt") as infile:
             pass
         lines.append("%d %s" % (line_number, entry))
 
-print lines
+for good in lines:
+    print good
+
 print "ERROR'D"
 for xx in errors:
     print xx
