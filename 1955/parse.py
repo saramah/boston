@@ -66,7 +66,7 @@ with open("sample_1955.txt") as infile:
             died.append("%d %s lastname: %s" % (line_number, line.strip(), last_name))
             continue
         entry = {}
-        last_chomp = ""
+        last_chomp = -1
         lineiter = line.split().__iter__()
         try:
             #first bit in the line.
@@ -77,36 +77,23 @@ with open("sample_1955.txt") as infile:
             #   -continuation of previous line; considered ERROR'D for now
             chomp = lineiter.next() 
             #lastname
-            if chomp.isupper():
+            if chomp.capitalize() in lnames:
                 last_name = chomp.capitalize()
-                continue
+                #lastname continuation header
+                if chomp.isupper():
+                    continue
+                last_chomp = las
             #firstname
             if chomp.startswith("\x97"):
-                first = chomp[4:].capitalize()
-                try:
+                first = chomp[1:].capitalize()
+                if first in nameabbr:
                     entry["first"] = nameabbr[first]
-                except KeyError:
+                else:
                     entry["first"] = first
                 entry["last"] = last_name
                 last_chomp = fir
-            #lastname
-            try:
-                if lnames[chomp.capitalize()]:
-                    try:
-                        #if we already have a last name, for
-                        #the case when street or first name
-                        #collides with last name
-                        if entry["last"]:
-                            break
-                    except KeyError:
-                        last_name = chomp
-                        last_chomp = las
-                        #if it's the only thing on the line,
-                        #we don't set the entry lastname because
-                        #we don't want to make it an entry
-                        continue
-            except KeyError:
-                errors.append("%d %s" % (line_number, line))
+            if last_chomp is -1:
+                errors.append("%d %s UNHANDLED PREFIX" % (line_number, line.strip()))
             #2nd bit on line
             #   -first name
             #   -initial, part of first name
@@ -119,15 +106,13 @@ with open("sample_1955.txt") as infile:
             #last thing we saw was a last name
             if last_chomp is las:
                 first = chomp.capitalize()
-                try:
+                if first in nameabbr:
                     entry["first"] = nameabbr[first]
-                except KeyError:
-                    try:
-                        if ffirst[chomp]:
-                            entry["first"] = chomp
-                    except KeyError:
-                        errors.append("%d %s" % (line_number, line))
-                        continue
+                elif chomp in fnames:
+                    entry["first"] = chomp
+                else:
+                    errors.append("%d %s NO NAME" % (line_number, line.strip()))
+                    continue
                 last_chomp = fir
             #neighborhood
 #            try:
