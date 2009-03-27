@@ -30,8 +30,7 @@ def build_dictionary(path):
 #last names, male/female first names, streets, neighborhoods
 #neighborhood abbreviations, name abbreviations
 lnames = build_dictionary("../dict/lastnames.txt")
-mnames = build_dictionary("../dict/mfirst.txt")
-fnames = build_dictionary("../dict/ffirst.txt")
+fnames = build_dictionary("../dict/firstnames.txt")
 streets = build_dictionary("../dict/streetnames.txt")
 nhoods = build_dictionary("../dict/neighborhoods.txt")
 nameabbr = build_dictionary("../dict/firstabbr.txt")
@@ -68,18 +67,29 @@ with open("sample_1955.txt") as infile:
             continue
         entry = {}
         last_chomp = ""
-        line = line.split().__iter__()
+        lineiter = line.split().__iter__()
         try:
             #first bit in the line.
             #   -uppercased lname header (continuation)
             #   -subline
             #   -singleton/first instance of lname
-            #   -continuation of previous line
-            chomp = line.next() 
-            #last name
+            #
+            #   -continuation of previous line; considered ERROR'D for now
+            chomp = lineiter.next() 
+            #lastname
             if chomp.isupper():
                 last_name = chomp.capitalize()
                 continue
+            #firstname
+            if chomp.startswith("\x97"):
+                first = chomp[4:].capitalize()
+                try:
+                    entry["first"] = nameabbr[first]
+                except KeyError:
+                    entry["first"] = first
+                entry["last"] = last_name
+                last_chomp = fir
+            #lastname
             try:
                 if lnames[chomp.capitalize()]:
                     try:
@@ -95,17 +105,8 @@ with open("sample_1955.txt") as infile:
                         #we don't set the entry lastname because
                         #we don't want to make it an entry
                         continue
-            except KeyError: pass
-            #firstname
-            if chomp.startswith("\x97"):
-                first = chomp[4:].capitalize()
-                try:
-                    entry["first"] = nameabbr[first]
-                except KeyError:
-                    entry["first"] = first
-                entry["last"] = last_name
-                last_chomp = fir
-
+            except KeyError:
+                errors.append("%d %s" % (line_number, line))
             #2nd bit on line
             #   -first name
             #   -initial, part of first name
@@ -113,7 +114,7 @@ with open("sample_1955.txt") as infile:
             #   -profession
             #   -marital status
             #   
-            chomp = line.next()
+            chomp = lineiter.next()
 
             #last thing we saw was a last name
             if last_chomp is las:
@@ -121,19 +122,24 @@ with open("sample_1955.txt") as infile:
                 try:
                     entry["first"] = nameabbr[first]
                 except KeyError:
-                    entry["first"] = first
+                    try:
+                        if ffirst[chomp]:
+                            entry["first"] = chomp
+                    except KeyError:
+                        errors.append("%d %s" % (line_number, line))
+                        continue
                 last_chomp = fir
             #neighborhood
-            try:
-                entry["nh"] = neighabbr[chomp]
-            except KeyError:
-                try:
-                    if nhoods[chomp]:
-                        entry["nh"] = chomp
+#            try:
+ #               entry["nh"] = neighabbr[chomp]
+  #          except KeyError:
+   #             try:
+    #                if nhoods[chomp]:
+     #                   entry["nh"] = chomp
                 #everything without an explicit neighborhood entry
                 #is in Boston proper
-                except KeyError:
-                    entry["nh"] = "Boston"
+     #           except KeyError:
+      #              entry["nh"] = "Boston"
         except StopIteration:  
             pass
         lines.append("%d %s" % (line_number, entry))

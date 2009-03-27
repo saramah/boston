@@ -8,7 +8,6 @@ Arth Arthur
 Patk Patrick
 Michl Michael
 Geo George
-Flovd Floyd
 Abr Abraham
 Benj Benjamin
 Danl Daniel
@@ -17,3 +16,15 @@ Eug Eugene
 Fredk Frederick
 Margt Margaret
 Eliz Elizabeth
+Alex Alexander
+Alf Alfred
+Aug August
+Cath Catherine
+Jas James
+Kath Katherine
+Nathl Nathaniel
+Richd Richard
+Sol Solomon
+Steph Stephen
+Theo Theodore
+

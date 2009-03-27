@@ -14,3 +14,24 @@ CH Chestnut Hill
 Wash Washington
 Chel Chelsea
 JP Jamaica Plain
+Arl Arlington
+Belmt Belmont
+Chsn Charlestown
+Evrt Everett
+Fairm't Fairmont
+HP Hyde Park
+Maid Malden
+Mald Malden
+Med Medford
+Milt Milton
+Melr Melrose
+Newt Newton
+Nvl Newtonville
+Readv Readville
+Revr Revere
+Ros Roslindale
+SB South Boston
+Somv Somerville
+WR West Roxbury
+Wlnthp Winthrop
+Winch Winchester
