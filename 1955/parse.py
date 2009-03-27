@@ -14,18 +14,10 @@ def build_dictionary(path):
             val = True
             if len(line) > 1:
                 val = " ".join(line[1:]).strip()
-            try:
-                #ignore multiple keys, we only need one
-                if build[line[0].strip()]:
-                    continue
-            except KeyError:
+            if line[0].strip() not in build:
                 build[line[0].strip()] = val
     return build
     
-
-
-
-
 #####build dictionaries
 #last names, male/female first names, streets, neighborhoods
 #neighborhood abbreviations, name abbreviations
