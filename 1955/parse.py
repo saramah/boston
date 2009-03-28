@@ -1,39 +1,50 @@
 # at most 1 name per line
 # <97> at beginning of line, though not always
-# [lastname] firstname [initial] [(wifename)] [profession] [marital status] number streetname [neighborhood]
+# [lastname] firstname [initial] [Mrs] [(wifename)] [profession] [wid] [homeowner status] number streetname [neighborhood]
 # 
 
 import re
 import sys
 
-def build_dictionary(path):
+def build_dictionary(path, kv):
+    """
+    build_dictionary(path, kv)
+        -path is path to dictionary we want to parse
+        -kv is whether or not the dictionary is key-value pairs
+
+    note: this doesn't cover the case when you have both variable
+    length keys and values, only variable length values for kv pairs,
+    and variable length keys with no values
+    """
     build = {}
     with open(path) as infile:
         for line in infile:
-            line = line.split()
             val = True
-            if len(line) > 1:
-                val = " ".join(line[1:]).strip()
-            if line[0].strip() not in build:
-                build[line[0].strip()] = val
+            if kv is False:
+                key = line.strip().title()
+            else:
+                line = line.split()
+                key = line[0].strip().capitalize()
+                if len(line) > 1:
+                    val = " ".join(line[1:]).strip()
+            if key not in build:
+                build[key] = val
     return build
     
 #####build dictionaries
 #last names, male/female first names, streets, neighborhoods
 #neighborhood abbreviations, name abbreviations
-lnames = build_dictionary("../dict/lastnames.txt")
-fnames = build_dictionary("../dict/firstnames.txt")
-streets = build_dictionary("../dict/streetnames.txt")
-nhoods = build_dictionary("../dict/neighborhoods.txt")
-nameabbr = build_dictionary("../dict/firstabbr.txt")
-strabbr = build_dictionary("../dict/strabbr.txt")
-neighabbr = build_dictionary("../dict/neighabbr.txt")
+lnames = build_dictionary("../dict/lastnames.txt", False)
+fnames = build_dictionary("../dict/firstnames.txt", False)
+streets = build_dictionary("../dict/streetnames.txt", False)
+nhoods = build_dictionary("../dict/neighborhoods.txt", False)
+nameabbr = build_dictionary("../dict/firstabbr.txt", True)
+strabbr = build_dictionary("../dict/strabbr.txt", True)
+neighabbr = build_dictionary("../dict/neighabbr.txt", True)
 
 lines, errors, died = [], [], []
 
 #useful constants
-pattern = r'\bdied\b'
-
 las = 0 #lastname
 fir = 1 #firstname
 ini = 2 #initial
@@ -45,8 +56,7 @@ num = 7 #house number
 st = 8 #street name
 nei = 9 #neighborhood
 
-
-with open("sample_1955.txt") as infile:
+with open(sys.argv[1]) as infile:
     last_name = ""
     last_line_chomp = ""
     for line_number, line in enumerate(infile):
@@ -55,7 +65,7 @@ with open("sample_1955.txt") as infile:
         #skip lines of people who died, they lack address information
         #and so aren't useful for what we want. we'll hold onto them
         #anyway in died, just in case this info comes in handy later
-        if re.search(pattern, line):
+        if re.search(r'\bdied\b', line):
             died.append("%d %s lastname: %s" % (line_number, line.strip(), last_name))
             continue
         entry = {}
@@ -71,6 +81,13 @@ with open("sample_1955.txt") as infile:
             chomp = lineiter.next() 
             #lastname
             if chomp.capitalize() in lnames:
+                #XXX neighborhood/street/lastname collisions
+                if chomp.capitalize() in neighabbr:
+                    errors.append("%d %s NHOOD COLLISION" % (line_number, line.strip()))
+                    continue
+                elif chomp.capitalize() in streets:
+                    errors.append("%d %s STREET COLLISION" % (line_number, line.strip()))
+                    continue
                 last_name = chomp.capitalize()
                 #lastname continuation header
                 if chomp.isupper():
@@ -78,7 +95,7 @@ with open("sample_1955.txt") as infile:
                 last_chomp = las
             #firstname
             if chomp.startswith("\x97"):
-                first = chomp[1:].capitalize()
+                first = chomp[1:].capitalize().strip(",")
                 if first in nameabbr:
                     entry["first"] = nameabbr[first]
                 else:
@@ -103,7 +120,7 @@ with open("sample_1955.txt") as infile:
             #if the last thing we saw was a lastname,
             #then the next thing must be a firstname
             if last_chomp is las:
-                first = chomp.capitalize()
+                first = chomp.capitalize().strip(",")
                 if first in nameabbr:
                     entry["first"] = nameabbr[first]
                 elif chomp in fnames:
@@ -120,16 +137,16 @@ with open("sample_1955.txt") as infile:
             #   -own/rent ('r'enter, 'h'ouseholder)
             #   -"Mrs"
             elif last_chomp is fir:
-                #spouse name XXX not showing up
                 if chomp.startswith("("):
-                    if chomp.strip("()") not in fnames:
-                        errors.append("%d %s UNKNOWN SPOUSE NAME" % (line_number, line.strip()))
+                    if chomp.strip("()") in fnames:
+                        if not chomp.endswith(")"):
+                            initial = lineiter.next()
+                            chomp = chomp + " " + initial
+                        entry["spouse"] = chomp.strip("()")
+                        last_chomp = spo
+                    else:
+                        errors.append("%d %s UNKNOWN SPOUSE" % (line_number, line.strip()))
                         continue
-                    if not chomp.endswith(")"):
-                        initial = lineiter.next()
-                        chomp = chomp + " " + initial
-                    entry["spouse"] = chomp.strip("()")
-                    last_chomp = spo
                 #either profession, marital status, or home status
                 elif chomp.islower():
                     if chomp is "r":
