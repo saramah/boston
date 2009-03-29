@@ -28,6 +28,8 @@ Roslindale
 Roxbury
 South Boston
 South End
+Waltham
+Wellesley
 West End
 West Roxbury
 Winthrop
