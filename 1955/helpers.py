@@ -1,3 +1,10 @@
+"""
+helpers.py
+
+Helper functions for parse.py and preprocessor.py, 1955.
+"""
+
+
 def build_dictionary(path, kv):
     """
     build_dictionary(path, kv)
@@ -22,3 +29,28 @@ def build_dictionary(path, kv):
             if key not in build:
                 build[key] = val
     return build
+
+def condense_lines(line, linelist):
+    """
+    Condenses a list of lines into one line. Strips hyphens
+    and recondenses words, if split between lines. Otherwise
+    simply appends the next line, inserting space.
+    """
+    try:
+        line2 = linelist.pop(0)
+        space = " "
+        if line.endswith("-"):
+            line = line[:len(line)-1]
+            space = ""
+        line = "%s%s%s" % (line, space, line2)
+        condense_lines(line, linelist)
+    except IndexError: pass
+    return line
+
+def find_errors(line):
+    """
+    Looks for invalid characters in a line. If it finds one,
+    then it returns True; otherwise, it returns False
+    """
+    if not line.isalnum():
+        return True

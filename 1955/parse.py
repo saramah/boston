@@ -1,3 +1,17 @@
+"""
+parse.py
+
+Putting data from the 1955 Boston Directory into a useful format. Run
+preprocessor.py first, as it will increase the accuracy with which we
+can pull useful information from the OCR'd text.
+
+Invariants of data:
+    - at most 1 name per line
+    - every line has a firstname, a number, and a streetname
+    - if neighborhood is not given, address is in Boston proper
+
+"""
+
 # at most 1 name per line
 # <97> at beginning of line, though not always
 # [lastname] firstname [initial] [Mrs] [(wifename)] [profession] [wid] [homeowner status] number streetname [neighborhood]
@@ -5,7 +19,7 @@
 
 import re
 import sys
-from helpers import build_dictionary
+from helpers import build_dictionary, find_errors
     
 #####build dictionaries
 #last names, male/female first names, streets, neighborhoods
@@ -32,6 +46,8 @@ num = 7 #house number
 st = 8 #street name
 nei = 9 #neighborhood
 
+invalid = "`~!@#$%^&*_=+{}<>?/\|"
+
 with open(sys.argv[1]) as infile:
     last_name = ""
     last_line_chomp = ""
@@ -44,6 +60,11 @@ with open(sys.argv[1]) as infile:
         if re.search(r'\bdied\b', line):
             died.append("%d %s lastname: %s" % (line_number, line.strip(), last_name))
             continue
+        #if the line contains one of the invalid characters, error the line.
+        if find_errors(line):
+            errors.append("%d %s CONTAINS INVALID CHARS" % (line_number, line.strip()))
+            continue
+
         entry = {}
         last_chomp = -1
         lineiter = line.split().__iter__()

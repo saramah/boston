@@ -1,29 +1,20 @@
-import sys
-from helpers import build_dictionary
+"""
+preprocessor.py
 
-def condense_lines(line, linelist):
-    """
-    Condenses a list of lines into one line. Strips hyphens
-    and recondenses words, if split between lines. Otherwise
-    simply appends the next line, inserting space.
-    """
-    try:
-        line2 = linelist.pop(0)
-        space = " "
-        if line.endswith("-"):
-            line = line[:len(line)-1]
-            space = ""
-        line = "%s%s%s" % (line, space, line2)
-        condense_lines(line, linelist)
-    except IndexError: pass
-    return line
+Cleans up 1955 data by attempting to rejoin split lines before
+actual parsing begins
+"""
+
+import sys
+from helpers import build_dictionary, condense_lines 
 
 ntuple = ("Dor", "Mat", "Bline", "Br", "Winthp", "Rox", "W'Town",
           "Alls", "Camb", "Wol", "EB", "CH", "Wash", "Chel", "JP",
           "Arl", "Belmt", "Chsn", "Evrt", "Fairm't", "HP", "Maid",
           "Mald", "Med", "Milt", "Melr", "Newt", "Nvl", "Readv",
           "Revr", "Ros", "SB", "Somv", "WR", "Wlnthp", "Winch",
-          "Wellesley", "Wakefield", "Quincy", "do")
+          "Wellesley", "Wakefield", "Quincy", "do", "Lynn", "Bedford",
+          "Box", "Newton")
 
 lnames = build_dictionary("../dict/lastnames.txt", False)
 
@@ -33,9 +24,13 @@ with open(sys.argv[1]) as infile:
         condense = False
         for line in infile:
             line = line.strip()
+            if line.startswith("--"):
+                line = "\x97%s" %(line[2:])
+            elif line.startswith(("_", "-")):
+                line = "\x97%s" %(line[1:])
             if condense:
                 start = line.split()[0]
-                if line.startswith("\x97") or start.isupper() or start in lnames:
+                if not start in ntuple and (line.startswith("\x97") or start.isupper() or start in lnames):
                     #false alarm, new entry or lname header
                     outfile.write(prev_line + '\n')
                 else:
