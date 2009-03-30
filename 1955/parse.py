@@ -13,7 +13,6 @@ Invariants of data:
 """
 
 # at most 1 name per line
-# <97> at beginning of line, though not always
 # [lastname] firstname [initial] [Mrs] [(wifename)] [profession] [wid] [homeowner status] number streetname [neighborhood]
 # 
 
@@ -46,7 +45,6 @@ num = 7 #house number
 st = 8 #street name
 nei = 9 #neighborhood
 
-invalid = "`~!@#$%^&*_=+{}<>?/\|"
 
 with open(sys.argv[1]) as infile:
     last_name = ""
@@ -155,9 +153,6 @@ with open(sys.argv[1]) as infile:
                     elif chomp is "wid":
                         entry["widowed"] = True
                         last_chomp = wid
-                    #initial to tack on to first name
-                    elif chomp.isalpha() and len(chomp) is 1:
-                        entry["first"] = entry["first"] + " " + chomp
                     else:
                         #TODO: grab professional abbreviations, convert abbr version to
                         #expanded version
@@ -165,6 +160,10 @@ with open(sys.argv[1]) as infile:
                         last_chomp = pro
                 elif chomp is "Mrs":
                     pass
+                #initial to tack on to first name
+                elif chomp.isalpha() and len(chomp) is 1:
+                    entry["first"] = entry["first"] + " " + chomp
+                    last_chomp = ini
                 else:
                     errors.append("%d %s UNKNOWN 2nd CHOMP" % (line_number, line.strip()))
                     continue
@@ -191,6 +190,15 @@ for good in lines:
 print "ERROR'D"
 for xx in errors:
     print xx
+
+llength = len(lines)
+elength = len(errors)
+total = llength + elength
+
+print "good lines: %d" % (llength)
+print "bad lines: %d" % (elength)
+print total
+print "error rate: %f" % (float(elength)/total)
 #print "DIED"
 #for dead in died:
 #    print dead

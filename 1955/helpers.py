@@ -52,5 +52,10 @@ def find_errors(line):
     Looks for invalid characters in a line. If it finds one,
     then it returns True; otherwise, it returns False
     """
-    if not line.isalnum():
-        return True
+#    if not line.strip()[1:].isalnum():
+#        return True
+    invalid = "`~!@#$%^*_=+{}<>?/\|"
+    for char in invalid:
+        if char in line:
+            return True
+    return False
