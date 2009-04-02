@@ -69,6 +69,8 @@ def valid_jump(first, second):
     the first letters. We're assuming that they have at least
     two characters.
     """
+    if first is "":
+        return True
     dist_firstletter = ord(second[0].lower()) - ord(first[0].lower())
     if dist_firstletter < 0 or dist_firstletter > 1:
         return False
@@ -78,3 +80,20 @@ def valid_jump(first, second):
             return False
         return True
 
+def recognize(bit):
+    """
+    Recognizes the meaning of the bit passed in and returns
+    a tuple; the first bit of the tuple is the key for the
+    entry, while the second is the value, and the third is the
+    value for last_chomp.
+    """
+    if bit is "r":
+        return ("ownership", "renter")
+    elif bit is "h":
+        return ("ownership", "owner")
+    elif bit is "wid":
+        return ("widowed", True)
+    elif bit is "Mrs":
+        return ("married", True)
+    else:
+        return (None, None)

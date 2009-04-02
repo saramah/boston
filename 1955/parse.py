@@ -17,7 +17,7 @@ Invariants of data:
 
 import re
 import sys
-from helpers import build_dictionary, find_errors, valid_jump
+from helpers import build_dictionary, find_errors, valid_jump, recognize
     
 #####build dictionaries
 #last names, male/female first names, streets, neighborhoods
@@ -30,7 +30,7 @@ nameabbr = build_dictionary("../dict/firstabbr.txt", True)
 strabbr = build_dictionary("../dict/strabbr.txt", True)
 neighabbr = build_dictionary("../dict/neighabbr.txt", True)
 
-lines, errors, died = [], [], []
+lines, future, errors, died = [], [], [], []
 
 #useful constants
 las = 0 #lastname
@@ -76,20 +76,18 @@ with open(sys.argv[1]) as infile:
                 chomp = chomp.capitalize()
                 #XXX neighborhood/street/lastname collisions
                 if chomp in neighabbr:
-                    errors.append("%d %s NHOOD COLLISION" % (line_number, line.strip()))
+                    errors.append("%d %s NHOOD COLLISION" % (line_number+1, line.strip()))
                     continue
                 elif chomp in streets:
-                    errors.append("%d %s STREET COLLISION" % (line_number, line.strip()))
+                    errors.append("%d %s STREET COLLISION" % (line_number+1, line.strip()))
                     continue
-#                try:
- #                   if not valid_jump(last_name, chomp):
-  #                      errors.append("%d %s LNAME MOVING BACKWARDS" % (line_number, line.strip()))
-   #                     continue
-    #            except IndexError:
-     #               errors.append("%d %s BAD COMPARISON" % (line_number, line.strip()))
-      #              continue
-                last_name = chomp
-                last_chomp = las
+                else:
+                    if valid_jump(last_name, chomp):
+                        last_name = chomp
+                        last_chomp = las
+                    else:
+                        errors.append("%d %s BAD JUMP" % (line_number+1, line.strip()))
+                        continue
             #firstname
             if chomp.startswith("\x97"):
                 first = chomp[1:].capitalize().strip(",")
@@ -98,12 +96,15 @@ with open(sys.argv[1]) as infile:
                 else:
                     entry["first"] = first
                 entry["last"] = last_name
-                last_chomp = fir
+                if len(first) is 1:
+                    last_chomp = ini
+                else:
+                    last_chomp = fir
             #at the moment, we're not handling continued lines, 
             #which is more than half of the errors list
             if last_chomp is -1:
 #DEBUG                lines.append("%d %s" % (line_number, line.strip()))
-                errors.append("%d %s UNHANDLED PREFIX" % (line_number, line.strip()))
+                errors.append("%d %s UNHANDLED PREFIX" % (line_number+1, line.strip()))
                 continue
             #2nd bit on line
             #   -first name
@@ -123,8 +124,9 @@ with open(sys.argv[1]) as infile:
                 elif chomp in fnames:
                     entry["first"] = chomp
                 else:
-                    errors.append("%d %s NO NAME" % (line_number, line.strip()))
+                    errors.append("%d %s NO NAME" % (line_number+1, line.strip()))
                     continue
+                entry["last"] = last_name
                 last_chomp = fir
             #if the last thing we say was a firstname, 
             #next could be one of five things:
@@ -142,7 +144,7 @@ with open(sys.argv[1]) as infile:
                         entry["spouse"] = chomp.strip("()")
                         last_chomp = spo
                     else:
-                        errors.append("%d %s UNKNOWN SPOUSE" % (line_number, line.strip()))
+                        errors.append("%d %s UNKNOWN SPOUSE" % (line_number+1, line.strip()))
                         continue
                 #either profession, marital status, or home status
                 elif chomp.islower():
@@ -169,7 +171,7 @@ with open(sys.argv[1]) as infile:
                 #otherwise, we have a strange chomp that we're not dealing with yet.
                 #implies commercial or one of  I, II, III or something unknown
                 else:
-                    errors.append("%d %s UNKNOWN 2nd CHOMP" % (line_number, line.strip()))
+                    future.append("%d %s UNKNOWN 2nd CHOMP" % (line_number+1, line.strip()))
                     continue
 
                 chomp = lineiter.next()
@@ -186,10 +188,14 @@ with open(sys.argv[1]) as infile:
       #              entry["nh"] = "Boston"
         except StopIteration:  
             pass
-        lines.append("%d %s" % (line_number, entry))
+        lines.append("%d %s" % (line_number+1, entry))
 
 for good in lines:
     print good
+
+print "TO BE DEALT WITH"
+for fut in future:
+    print fut
 
 print "ERROR'D"
 for xx in errors:
@@ -197,10 +203,12 @@ for xx in errors:
 
 llength = len(lines)
 elength = len(errors)
-total = llength + elength
+flength = len(future)
+total = llength + elength + flength
 
 print "good lines: %d" % (llength)
 print "bad lines: %d" % (elength)
+print "tbd lines: %d" % (flength)
 print total
 print "error rate: %f" % (float(elength)/total)
 #print "DIED"
