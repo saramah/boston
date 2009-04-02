@@ -30,7 +30,7 @@ nameabbr = build_dictionary("../dict/firstabbr.txt", True)
 strabbr = build_dictionary("../dict/strabbr.txt", True)
 neighabbr = build_dictionary("../dict/neighabbr.txt", True)
 
-lines, future, errors, died = [], [], [], []
+lines, errors, died = [], [], []
 
 #useful constants
 las = 0 #lastname
@@ -147,45 +147,37 @@ with open(sys.argv[1]) as infile:
                         errors.append("%d %s UNKNOWN SPOUSE" % (line_number+1, line.strip()))
                         continue
                 #either profession, marital status, or home status
-                elif chomp.islower():
-                    if chomp is "r":
-                        entry["ownership"] = "renter"
-                        last_chomp = own 
-                    elif chomp is "h":
-                        entry["ownership"] = "owner"
-                        last_chomp = own
-                    elif chomp is "wid":
-                        entry["widowed"] = True
-                        last_chomp = wid
-                    else:
-                        #TODO: grab professional abbreviations, convert abbr version to
-                        #expanded version
+                else:
+                    tup = recognize(chomp)
+                    if tup is None:
                         entry["prof"] = chomp
                         last_chomp = pro
-                elif chomp is "Mrs":
-                    pass
-                #initial to tack on to first name
-                elif chomp.isalpha() and len(chomp) is 1:
-                    entry["first"] = entry["first"] + " " + chomp
-                    last_chomp = ini
-                #otherwise, we have a strange chomp that we're not dealing with yet.
-                #implies commercial or one of  I, II, III or something unknown
-                else:
-                    future.append("%d %s UNKNOWN 2nd CHOMP" % (line_number+1, line.strip()))
-                    continue
-
+                    else:
+                        #initial is special case; need to tack it onto entry["first"]
+                        if tup[2] is ini:
+                            entry["first"] = entry["first"] + " " + chomp
+                        else:
+                            entry[tup[0]] = tup[1]
+                        last_chomp = tup[2]
+                    #otherwise, we have a strange chomp that we're not dealing with yet.
+                    #implies commercial or one of  I, II, III or something unknown
+                    #else:
+                    #    future.append("%d %s UNKNOWN 2nd CHOMP" % (line_number+1, line.strip()))
+                    #    continue
+            while(not chomp.isdigit()):
                 chomp = lineiter.next()
-            #neighborhood
-#            try:
- #               entry["nh"] = neighabbr[chomp]
-  #          except KeyError:
-   #             try:
-    #                if nhoods[chomp]:
-     #                   entry["nh"] = chomp
-                #everything without an explicit neighborhood entry
-                #is in Boston proper
-     #           except KeyError:
-      #              entry["nh"] = "Boston"
+
+            entry["number"] = chomp
+
+            chomp = lineiter.next()
+            if chomp in strabbr:
+                entry["street"] = strabbr[chomp]
+            elif chomp in streets:
+                entry["street"] = chomp
+            else:
+                errors.append("%d %s UNRECOGNIZED STREET" % (line_number+1, line.strip()))
+                continue
+
         except StopIteration:  
             pass
         lines.append("%d %s" % (line_number+1, entry))
@@ -193,22 +185,16 @@ with open(sys.argv[1]) as infile:
 for good in lines:
     print good
 
-print "TO BE DEALT WITH"
-for fut in future:
-    print fut
-
 print "ERROR'D"
 for xx in errors:
     print xx
 
 llength = len(lines)
 elength = len(errors)
-flength = len(future)
-total = llength + elength + flength
+total = llength + elength
 
 print "good lines: %d" % (llength)
 print "bad lines: %d" % (elength)
-print "tbd lines: %d" % (flength)
 print total
 print "error rate: %f" % (float(elength)/total)
 #print "DIED"

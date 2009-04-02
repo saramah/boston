@@ -80,6 +80,18 @@ def valid_jump(first, second):
             return False
         return True
 
+#copied constants; XXX can i stick this in just one file only?
+las = 0 #lastname
+fir = 1 #firstname
+ini = 2 #initial
+spo = 3 #spouse
+pro = 4 #profession
+mar = 5 #wid
+own = 6 #house ownership status
+num = 7 #house number
+st = 8 #street name
+nei = 9 #neighborhood
+
 def recognize(bit):
     """
     Recognizes the meaning of the bit passed in and returns
@@ -88,12 +100,18 @@ def recognize(bit):
     value for last_chomp.
     """
     if bit is "r":
-        return ("ownership", "renter")
+        return ("ownership", "renter", own)
     elif bit is "h":
-        return ("ownership", "owner")
+        return ("ownership", "owner", own)
     elif bit is "wid":
-        return ("widowed", True)
+        return ("widowed", True, mar)
     elif bit is "Mrs":
-        return ("married", True)
+        return ("married", True, mar)
+    elif bit.isalpha() and len(bit) is 1:
+        return ("first", bit, ini)
+    elif bit is "II" or bit is "III":
+        return ("first", bit, ini)
+    elif bit.isdigit():
+        return ("number", bit, num)
     else:
-        return (None, None)
+        return None

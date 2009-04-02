@@ -25,11 +25,16 @@ with open(sys.argv[1]) as infile:
         for line in infile:
             if line.isspace():
                 continue
+            #stripping whitespace, commas, and periods
             line = line.strip()
+            line = line.replace(",","")
+            line = line.replace(".","")
+            #converting subentries to a consistent start
             if line.startswith("--"):
                 line = "\x97%s" %(line[2:])
             elif line.startswith(("_", "-")):
                 line = "\x97%s" %(line[1:])
+            #condensing entries to one line
             if condense:
                 start = line.split()[0]
                 if not start in ntuple and (line.startswith("\x97") or start.isupper() or start in lnames):
@@ -38,6 +43,9 @@ with open(sys.argv[1]) as infile:
                 else:
                     line = condense_lines(prev_line, [line])
                 condense = False
+            #a line needs to be condensed if it doesn't end with a neighborhood
+            #XXX this doesn't work with Boston entries, as entries in boston proper
+            #don't end with any neighborhood
             if not line.endswith(ntuple):
                 prev_line = line
                 condense = True
