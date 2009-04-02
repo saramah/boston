@@ -52,10 +52,29 @@ def find_errors(line):
     Looks for invalid characters in a line. If it finds one,
     then it returns True; otherwise, it returns False
     """
-#    if not line.strip()[1:].isalnum():
-#        return True
     invalid = "`~!@#$%^*_=+{}<>?/\|"
     for char in invalid:
         if char in line:
             return True
     return False
+
+def valid_jump(first, second):
+    """
+    Making sure that we're a) only moving forward in the
+    alphabet and b) we're not jumping more than distance one
+    at a time. ie, only Button -> Callahan, not Thomas ->
+    Abington.
+
+    first and second should be full words or names, not just
+    the first letters. We're assuming that they have at least
+    two characters.
+    """
+    dist_firstletter = ord(second[0].lower()) - ord(first[0].lower())
+    if dist_firstletter < 0 or dist_firstletter > 1:
+        return False
+    else:
+        dist_secondletter = ord(second[1].lower()) - ord(first[1].lower())
+        if dist_secondletter < 0:
+            return False
+        return True
+

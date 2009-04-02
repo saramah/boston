@@ -23,6 +23,8 @@ with open(sys.argv[1]) as infile:
         prev_line = ""
         condense = False
         for line in infile:
+            if line.isspace():
+                continue
             line = line.strip()
             if line.startswith("--"):
                 line = "\x97%s" %(line[2:])

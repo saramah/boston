@@ -14,11 +14,10 @@ Invariants of data:
 
 # at most 1 name per line
 # [lastname] firstname [initial] [Mrs] [(wifename)] [profession] [wid] [homeowner status] number streetname [neighborhood]
-# 
 
 import re
 import sys
-from helpers import build_dictionary, find_errors
+from helpers import build_dictionary, find_errors, valid_jump
     
 #####build dictionaries
 #last names, male/female first names, streets, neighborhoods
@@ -45,10 +44,8 @@ num = 7 #house number
 st = 8 #street name
 nei = 9 #neighborhood
 
-
 with open(sys.argv[1]) as infile:
     last_name = ""
-    last_line_chomp = ""
     for line_number, line in enumerate(infile):
         if line_number % 1000 is 0:
             print line_number
@@ -76,17 +73,22 @@ with open(sys.argv[1]) as infile:
             chomp = lineiter.next() 
             #lastname
             if chomp.capitalize() in lnames:
+                chomp = chomp.capitalize()
                 #XXX neighborhood/street/lastname collisions
-                if chomp.capitalize() in neighabbr:
+                if chomp in neighabbr:
                     errors.append("%d %s NHOOD COLLISION" % (line_number, line.strip()))
                     continue
-                elif chomp.capitalize() in streets:
+                elif chomp in streets:
                     errors.append("%d %s STREET COLLISION" % (line_number, line.strip()))
                     continue
-                last_name = chomp.capitalize()
-                #lastname continuation header
-                if chomp.isupper():
-                    continue
+#                try:
+ #                   if not valid_jump(last_name, chomp):
+  #                      errors.append("%d %s LNAME MOVING BACKWARDS" % (line_number, line.strip()))
+   #                     continue
+    #            except IndexError:
+     #               errors.append("%d %s BAD COMPARISON" % (line_number, line.strip()))
+      #              continue
+                last_name = chomp
                 last_chomp = las
             #firstname
             if chomp.startswith("\x97"):
@@ -164,6 +166,8 @@ with open(sys.argv[1]) as infile:
                 elif chomp.isalpha() and len(chomp) is 1:
                     entry["first"] = entry["first"] + " " + chomp
                     last_chomp = ini
+                #otherwise, we have a strange chomp that we're not dealing with yet.
+                #implies commercial or one of  I, II, III or something unknown
                 else:
                     errors.append("%d %s UNKNOWN 2nd CHOMP" % (line_number, line.strip()))
                     continue
