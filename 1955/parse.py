@@ -128,7 +128,10 @@ with open(sys.argv[1]) as infile:
             while(not chomp.isdigit()):
                 tup = recognize(chomp)
                 if tup is None:
-                    entry["prof"] = chomp
+                    if "prof" in entry:
+                        entry["prof"] = entry["prof"] + " " + chomp
+                    else:
+                        entry["prof"] = chomp
                     last_chomp = pro
                 else:
                     #initial is special case; need to tack it onto entry["first"]
@@ -196,6 +199,17 @@ with open(sys.argv[1]) as infile:
                     continue
             else:
                 entry[tup[0]] = tup[1]                
+
+            #default neighborhood
+            entry["nh"] = "Boston"
+
+            chomp = lineiter.next()
+
+            if chomp in neighabbr:
+                entry["nh"] = neighabbr[chomp]
+            else:
+                errors.append("%d %s NOT THE END?" % (line_number+1, line.strip()))
+                continue
 
         except StopIteration:  
             pass
