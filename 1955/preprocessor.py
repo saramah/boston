@@ -6,23 +6,18 @@ actual parsing begins
 """
 
 import sys
-from helpers import build_dictionary, condense_lines 
+from helpers import build_dictionary, condense_lines, valid_jump 
 
-ntuple = ("Dor", "Mat", "Bline", "Br", "Winthp", "Rox", "W'Town",
-          "Alls", "Camb", "Wol", "EB", "CH", "Wash", "Chel", "JP",
-          "Arl", "Belmt", "Chsn", "Evrt", "Fairm't", "HP", "Maid",
-          "Mald", "Med", "Milt", "Melr", "Newt", "Nvl", "Readv",
-          "Revr", "Ros", "SB", "Somv", "WR", "Wlnthp", "Winch",
-          "Wellesley", "Wakefield", "Quincy", "do", "Lynn", "Bedford",
-          "Box", "Newton")
-
+ntuple = tuple(build_dictionary("../dict/neighabbr.txt", True).keys())
 lnames = build_dictionary("../dict/lastnames.txt", False)
 
 with open(sys.argv[1]) as infile:
     with open(sys.argv[2], 'w') as outfile:
         prev_line = ""
         condense = False
+        lastname = ""
         for line in infile:
+            #ignore empty lines
             if line.isspace():
                 continue
             #stripping whitespace, commas, and periods
@@ -37,7 +32,8 @@ with open(sys.argv[1]) as infile:
             #condensing entries to one line
             if condense:
                 start = line.split()[0]
-                if not start in ntuple and (line.startswith("\x97") or start.isupper() or start in lnames):
+                if not start in ntuple and (line.startswith("\x97") 
+                        or start.isupper() or start in lnames):
                     #false alarm, new entry or lname header
                     outfile.write(prev_line + '\n')
                 else:

@@ -69,7 +69,7 @@ def valid_jump(first, second):
     the first letters. We're assuming that they have at least
     two characters.
     """
-    if first is "":
+    if first == "":
         return True
     dist_firstletter = ord(second[0].lower()) - ord(first[0].lower())
     if dist_firstletter < 0 or dist_firstletter > 1:
@@ -90,7 +90,8 @@ mar = 5 #wid
 own = 6 #house ownership status
 num = 7 #house number
 st = 8 #street name
-nei = 9 #neighborhood
+suf = 9 #street suffix
+nei = 10 #neighborhood
 
 def recognize(bit):
     """
@@ -99,19 +100,37 @@ def recognize(bit):
     entry, while the second is the value, and the third is the
     value for last_chomp.
     """
-    if bit is "r":
+    if bit == "r":
         return ("ownership", "renter", own)
-    elif bit is "h":
+    elif bit == "h":
         return ("ownership", "owner", own)
-    elif bit is "wid":
+    elif bit == "wid":
         return ("widowed", True, mar)
-    elif bit is "Mrs":
+    elif bit == "Mrs":
         return ("married", True, mar)
+    elif bit.startswith("(") or bit.endswith(")"):
+        bit = bit.strip("()")
+        return ("spouse", bit, spo)
     elif bit.isalpha() and len(bit) is 1:
         return ("first", bit, ini)
-    elif bit is "II" or bit is "III":
+    elif bit == "II" or bit == "III":
         return ("first", bit, ini)
     elif bit.isdigit():
         return ("number", bit, num)
+    elif bit == "rd":
+        bit = "Rd"
+        return ("strsuffix", bit, suf)
+    elif bit == "ct":
+        bit = "Ct"
+        return ("strsuffix", bit, suf)
+    elif bit == "st":
+        bit = "St"
+        return ("strsuffix", bit, suf)
+    elif bit == "pk":
+        bit = "Pk"
+        return ("strsuffix", bit, suf)
+    elif bit == "av":
+        bit = "Ave"
+        return ("strsuffix", bit, suf)
     else:
         return None

@@ -17,7 +17,7 @@ Invariants of data:
 
 import re
 import sys
-from helpers import build_dictionary, find_errors, valid_jump, recognize
+from helpers import * 
     
 #####build dictionaries
 #last names, male/female first names, streets, neighborhoods
@@ -30,19 +30,7 @@ nameabbr = build_dictionary("../dict/firstabbr.txt", True)
 strabbr = build_dictionary("../dict/strabbr.txt", True)
 neighabbr = build_dictionary("../dict/neighabbr.txt", True)
 
-lines, errors, died = [], [], []
-
-#useful constants
-las = 0 #lastname
-fir = 1 #firstname
-ini = 2 #initial
-spo = 3 #spouse
-pro = 4 #profession
-mar = 5 #wid
-own = 6 #house ownership status
-num = 7 #house number
-st = 8 #street name
-nei = 9 #neighborhood
+lines, errors, broken, died = [], [], [], []
 
 with open(sys.argv[1]) as infile:
     last_name = ""
@@ -57,19 +45,18 @@ with open(sys.argv[1]) as infile:
             continue
         #if the line contains one of the invalid characters, error the line.
         if find_errors(line):
-            errors.append("%d %s CONTAINS INVALID CHARS" % (line_number, line.strip()))
+            broken.append("%d %s CONTAINS INVALID CHARS" % (line_number, line.strip()))
             continue
 
         entry = {}
         last_chomp = -1
+        last_entry = {}
         lineiter = line.split().__iter__()
         try:
             #first bit in the line.
             #   -uppercased lname header (continuation)
             #   -subline
             #   -singleton/first instance of lname
-            #
-            #   -continuation of previous line; considered ERROR'D for now
             chomp = lineiter.next() 
             #lastname
             if chomp.capitalize() in lnames:
@@ -86,7 +73,7 @@ with open(sys.argv[1]) as infile:
                         last_name = chomp
                         last_chomp = las
                     else:
-                        errors.append("%d %s BAD JUMP" % (line_number+1, line.strip()))
+                        broken.append("%d %s BAD JUMP" % (line_number+1, line.strip()))
                         continue
             #firstname
             if chomp.startswith("\x97"):
@@ -135,41 +122,52 @@ with open(sys.argv[1]) as infile:
             #   -initial
             #   -own/rent ('r'enter, 'h'ouseholder)
             #   -"Mrs"
-            elif last_chomp is fir:
-                if chomp.startswith("("):
-                    if chomp.strip("()") in fnames:
-                        if not chomp.endswith(")"):
-                            initial = lineiter.next()
-                            chomp = chomp + " " + initial
-                        entry["spouse"] = chomp.strip("()")
-                        last_chomp = spo
-                    else:
-                        errors.append("%d %s UNKNOWN SPOUSE" % (line_number+1, line.strip()))
-                        continue
-                #either profession, marital status, or home status
-                else:
-                    tup = recognize(chomp)
-                    if tup is None:
-                        entry["prof"] = chomp
-                        last_chomp = pro
-                    else:
-                        #initial is special case; need to tack it onto entry["first"]
-                        if tup[2] is ini:
-                            entry["first"] = entry["first"] + " " + chomp
-                        else:
-                            entry[tup[0]] = tup[1]
-                        last_chomp = tup[2]
-                    #otherwise, we have a strange chomp that we're not dealing with yet.
-                    #implies commercial or one of  I, II, III or something unknown
-                    #else:
-                    #    future.append("%d %s UNKNOWN 2nd CHOMP" % (line_number+1, line.strip()))
-                    #    continue
+            broke = False
+            #XXX this misses the case when there is no street number, just
+            # a street.
             while(not chomp.isdigit()):
+                tup = recognize(chomp)
+                if tup is None:
+                    entry["prof"] = chomp
+                    last_chomp = pro
+                else:
+                    #initial is special case; need to tack it onto entry["first"]
+                    if tup[2] is ini:
+                        entry["first"] = entry["first"] + " " + chomp
+                    elif tup[2] is spo:
+                        chomp = tup[1]
+                        if chomp in nameabbr:
+                            chomp = nameabbr[chomp]
+                        if chomp in fnames:
+                            if "spouse" in entry:
+                                entry["spouse"] = entry["spouse"] + " " + chomp
+                            else:
+                                entry["spouse"] = chomp
+                        else:
+                            errors.append("%d %s INVALID SPOUSENAME" % (line_number+1, line.strip()))
+                            broke = True
+                            break
+                    else:
+                        entry[tup[0]] = tup[1]
+                    last_chomp = tup[2]
                 chomp = lineiter.next()
 
+            if broke:
+                continue
             entry["number"] = chomp
 
             chomp = lineiter.next()
+            #expanding direction names for streets
+            if chomp == "E":
+                chomp = "East " + lineiter.next().strip()
+            elif chomp == "S":
+                chomp = "South " + lineiter.next().strip()
+            elif chomp == "W":
+                chomp = "West " + lineiter.next().strip()
+            elif chomp == "N":
+                chomp = "North " + lineiter.next().strip()
+            
+            #picking out the street name
             if chomp in strabbr:
                 entry["street"] = strabbr[chomp]
             elif chomp in streets:
@@ -177,9 +175,36 @@ with open(sys.argv[1]) as infile:
             else:
                 errors.append("%d %s UNRECOGNIZED STREET" % (line_number+1, line.strip()))
                 continue
+            #default street suffix of St
+            entry["strsuffix"] = "St"
+
+            chomp = lineiter.next()
+
+            tup = recognize(chomp)
+            if tup is None:
+                #second half of streetname?
+                if "street" in entry:
+                    whole = entry["street"] + " " + chomp
+                    if whole in strabbr:
+                        entry["street"] = whole
+                    elif whole in streets:
+                        entry["street"] = whole
+                elif chomp in neighabbr:
+                    entry["nh"] = neighabbr[chomp]
+                else:
+                    errors.append("%d %s UNKNOWN CHOMP" % (line_number+1, line.strip()))
+                    continue
+            else:
+                entry[tup[0]] = tup[1]                
 
         except StopIteration:  
             pass
+        #if an entry doesn't have at least a firstname, a lastname, and an address,
+        #error it so we can figure out why.
+        if "first" not in entry or "last" not in entry or "street" not in entry:
+            errors.append("%d %s INCOMPLETE ENTRY" % (line_number+1, line.strip()))
+            continue
+
         lines.append("%d %s" % (line_number+1, entry))
 
 for good in lines:
@@ -189,14 +214,20 @@ print "ERROR'D"
 for xx in errors:
     print xx
 
+#print "BROKEN"
+#for x in broken:
+#    print x
+
 llength = len(lines)
 elength = len(errors)
-total = llength + elength
+blength = len(broken)
+total = llength + elength + blength
 
 print "good lines: %d" % (llength)
-print "bad lines: %d" % (elength)
+print "fixable lines: %d" % (elength)
+print "broken lines: %d" % (blength)
 print total
-print "error rate: %f" % (float(elength)/total)
+print "error rate: %f" % (float(blength + elength)/total)
 #print "DIED"
 #for dead in died:
 #    print dead
