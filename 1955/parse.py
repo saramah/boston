@@ -32,6 +32,7 @@ neighabbr = build_dictionary("../dict/neighabbr.txt", True)
 
 lines, errors, broken, died = [], [], [], []
 
+
 with open(sys.argv[1]) as infile:
     last_name = ""
     for line_number, line in enumerate(infile):
@@ -59,26 +60,20 @@ with open(sys.argv[1]) as infile:
             #   -singleton/first instance of lname
             chomp = lineiter.next() 
             #lastname
+            #XXX Co H en vs Cohig see Cohen, Cohane only grabs Co from
+            #the first one, we'd like Cohen if possible
             if chomp.capitalize() in lnames:
                 chomp = chomp.capitalize()
-                #XXX neighborhood/street/lastname collisions
-                if chomp in neighabbr:
-                    errors.append("%d %s NHOOD COLLISION" % (line_number+1, line.strip()))
-                    continue
-                elif chomp in streets:
-                    errors.append("%d %s STREET COLLISION" % (line_number+1, line.strip()))
-                    continue
+                if valid_jump(last_name, chomp):
+                    last_name = chomp
+                    last_chomp = las
                 else:
-                    if valid_jump(last_name, chomp):
-                        last_name = chomp
-                        last_chomp = las
-                    else:
-                        broken.append("%d %s BAD JUMP" % (line_number+1, line.strip()))
-                        continue
+                    broken.append("%d %s BAD JUMP" % (line_number+1, line.strip()))
+                    continue
             #firstname
             if chomp.startswith("\x97"):
-                first = chomp[1:].capitalize().strip(",")
-                if first in nameabbr:
+                first = chomp[1:].capitalize()
+                if first.capitalize() in nameabbr:
                     entry["first"] = nameabbr[first]
                 else:
                     entry["first"] = first
@@ -108,13 +103,14 @@ with open(sys.argv[1]) as infile:
                 first = chomp.capitalize().strip(",")
                 if first in nameabbr:
                     entry["first"] = nameabbr[first]
-                elif chomp in fnames:
-                    entry["first"] = chomp
+                elif first in fnames:
+                    entry["first"] = first
                 else:
                     errors.append("%d %s NO NAME" % (line_number+1, line.strip()))
                     continue
                 entry["last"] = last_name
                 last_chomp = fir
+                chomp = lineiter.next()
             #if the last thing we say was a firstname, 
             #next could be one of five things:
             #   -spouse name
@@ -139,9 +135,9 @@ with open(sys.argv[1]) as infile:
                         entry["first"] = entry["first"] + " " + chomp
                     elif tup[2] is spo:
                         chomp = tup[1]
-                        if chomp in nameabbr:
-                            chomp = nameabbr[chomp]
-                        if chomp in fnames:
+                        if chomp.capitalize() in nameabbr:
+                            chomp = nameabbr[chomp.capitalize()]
+                        if chomp.capitalize() in fnames:
                             if "spouse" in entry:
                                 entry["spouse"] = entry["spouse"] + " " + chomp
                             else:
@@ -150,6 +146,8 @@ with open(sys.argv[1]) as infile:
                             errors.append("%d %s INVALID SPOUSENAME" % (line_number+1, line.strip()))
                             broke = True
                             break
+                    #XXX widowed is also a special case, deceased husband's name might
+                    #appear directly after this
                     else:
                         entry[tup[0]] = tup[1]
                     last_chomp = tup[2]
@@ -171,13 +169,10 @@ with open(sys.argv[1]) as infile:
                 chomp = "North " + lineiter.next().strip()
             
             #picking out the street name
-            if chomp in strabbr:
-                entry["street"] = strabbr[chomp]
-            elif chomp in streets:
-                entry["street"] = chomp
-            else:
-                errors.append("%d %s UNRECOGNIZED STREET" % (line_number+1, line.strip()))
-                continue
+            if chomp.capitalize() in strabbr:
+                entry["street"] = strabbr[chomp.capitalize()]
+            entry["street"] = chomp
+            last_chomp = str
             #default street suffix of St
             entry["strsuffix"] = "St"
 
@@ -188,35 +183,47 @@ with open(sys.argv[1]) as infile:
                 #second half of streetname?
                 if "street" in entry:
                     whole = entry["street"] + " " + chomp
-                    if whole in strabbr:
+                    if whole.title() in strabbr:
                         entry["street"] = whole
-                    elif whole in streets:
+                    elif whole.title() in streets:
                         entry["street"] = whole
-                elif chomp in neighabbr:
-                    entry["nh"] = neighabbr[chomp]
+                    last_chomp = str
+                elif chomp.capitalize() in neighabbr:
+                    entry["nh"] = neighabbr[chomp.capitalize()]
+                    last_chomp = nei
                 else:
                     errors.append("%d %s UNKNOWN CHOMP" % (line_number+1, line.strip()))
                     continue
             else:
                 entry[tup[0]] = tup[1]                
+                last_chomp = tup[2]
 
             #default neighborhood
             entry["nh"] = "Boston"
 
-            chomp = lineiter.next()
-
-            if chomp in neighabbr:
-                entry["nh"] = neighabbr[chomp]
-            else:
-                errors.append("%d %s NOT THE END?" % (line_number+1, line.strip()))
-                continue
+            #keep going until we hit an exception
+            while True:
+                chomp = lineiter.next()
+                tup = recognize(chomp)
+                if tup is None:
+                    if chomp.capitalize() in neighabbr:
+                        entry["nh"] = neighabbr[chomp.capitalize()]
+                        last_chomp = nei
+                    else:
+                        errors.append("%d %s NOT THE END?\n%d %s" % 
+                                (line_number+1, line.strip(), line_number+1, entry))
+                        break
+                else:
+                    entry[tup[0]] = tup[1]
+                    last_chomp = tup[2]
 
         except StopIteration:  
             pass
         #if an entry doesn't have at least a firstname, a lastname, and an address,
         #error it so we can figure out why.
         if "first" not in entry or "last" not in entry or "street" not in entry:
-            errors.append("%d %s INCOMPLETE ENTRY" % (line_number+1, line.strip()))
+            errors.append("%d %s INCOMPLETE ENTRY\n%d %s" % 
+                    (line_number+1, line.strip(), line_number+1, entry))
             continue
 
         lines.append("%d %s" % (line_number+1, entry))

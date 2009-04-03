@@ -39,6 +39,10 @@ with open(sys.argv[1]) as infile:
                 else:
                     line = condense_lines(prev_line, [line])
                 condense = False
+            if len(line.split()) < 3:
+                prev_line = line
+                condense = True
+                continue
             #a line needs to be condensed if it doesn't end with a neighborhood
             #XXX this doesn't work with Boston entries, as entries in boston proper
             #don't end with any neighborhood
