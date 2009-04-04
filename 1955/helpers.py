@@ -132,5 +132,14 @@ def recognize(bit):
     elif bit == "av":
         bit = "Ave"
         return ("strsuffix", bit, suf)
+    elif bit == "pi":
+        bit = "Pl"
+        return ("strsuffix", bit, suf)
+    elif bit == "sq"
+        bit = "Sq"
+        return ("strsuffix", bit, suf)
+    elif bit == "ter"
+        bit = "Ter"
+        return ("strsuffix", bit, suf)
     else:
         return None
