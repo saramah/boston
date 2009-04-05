@@ -8,17 +8,17 @@ W'town Watertown
 Alls Allston
 Camb Cambridge
 Wol Wollaston
-EB East Boston
-CH Chestnut Hill
+Eb East Boston
+Ch Chestnut Hill
 Wash Washington
 Chel Chelsea
-JP Jamaica Plain
+Jp Jamaica Plain
 Arl Arlington
 Belmt Belmont
 Chsn Charlestown
 Evrt Everett
 Fairm't Fairmont
-HP Hyde Park
+Hp Hyde Park
 Maid Malden
 Mald Malden
 Med Medford
@@ -29,10 +29,10 @@ Nvl Newtonville
 Readv Readville
 Revr Revere
 Ros Roslindale
-SB South Boston
+Sb South Boston
 Sharon Sharon
 Somv Somerville
-WR West Roxbury
+Wr West Roxbury
 Wlnthp Winthrop
 Winch Winchester
 Wakefield Wakefield
@@ -41,10 +41,10 @@ Newton Newton
 Quincy Quincy
 Lynn Lynn
 Bedford Bedford
-Box Roxbury
-VVR West Roxbury
+Box Boxboro
+Vvr West Roxbury
 Waltham Waltham
 Beachmont Beachmont
-IIP Hyde Park
+Iip Hyde Park
 Winthrop Winthrop
 Brookline Brookline

@@ -6,10 +6,9 @@ actual parsing begins
 """
 
 import sys
-from helpers import build_dictionary, condense_lines, valid_jump 
+from helpers import * 
 
 ntuple = tuple(build_dictionary("../dict/neighabbr.txt", True).keys())
-lnames = build_dictionary("../dict/lastnames.txt", False)
 
 with open(sys.argv[1]) as infile:
     with open(sys.argv[2], 'w') as outfile:
@@ -25,6 +24,10 @@ with open(sys.argv[1]) as infile:
             line = line.replace(",","")
             line = line.replace(".","")
             #converting subentries to a consistent start
+            if line.capitalize() in neighabbr:
+                prev_line += " " + line
+                outfile.write(prev_line + '\n')
+                continue
             if line.startswith("--"):
                 line = "\x97%s" %(line[2:])
             elif line.startswith(("_", "-")):

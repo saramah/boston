@@ -3,7 +3,21 @@ helpers.py
 
 Helper functions for parse.py and preprocessor.py, 1955.
 """
+import re
 
+#copied constants
+las = 0 #lastname
+fir = 1 #firstname
+ini = 2 #initial
+spo = 3 #spouse
+pro = 4 #profession
+mar = 5 #Mrs
+wid = 6 #widowed
+own = 7 #house ownership status
+num = 8 #house number
+st = 9 #street name
+suf = 10 #street suffix
+nei = 11 #neighborhood
 
 def build_dictionary(path, kv):
     """
@@ -29,6 +43,17 @@ def build_dictionary(path, kv):
             if key not in build:
                 build[key] = val
     return build
+
+#####build dictionaries
+#last names, male/female first names, streets, neighborhoods
+#neighborhood abbreviations, name abbreviations
+lnames = build_dictionary("../dict/lastnames.txt", False)
+fnames = build_dictionary("../dict/firstnames.txt", False)
+streets = build_dictionary("../dict/streetnames.txt", False)
+nhoods = build_dictionary("../dict/neighborhoods.txt", False)
+nameabbr = build_dictionary("../dict/firstabbr.txt", True)
+strabbr = build_dictionary("../dict/strabbr.txt", True)
+neighabbr = build_dictionary("../dict/neighabbr.txt", True)
 
 def condense_lines(line, linelist):
     """
@@ -80,18 +105,6 @@ def valid_jump(first, second):
             return False
         return True
 
-#copied constants; XXX can i stick this in just one file only?
-las = 0 #lastname
-fir = 1 #firstname
-ini = 2 #initial
-spo = 3 #spouse
-pro = 4 #profession
-mar = 5 #wid
-own = 6 #house ownership status
-num = 7 #house number
-st = 8 #street name
-suf = 9 #street suffix
-nei = 10 #neighborhood
 
 def recognize(bit):
     """
@@ -104,8 +117,10 @@ def recognize(bit):
         return ("ownership", "renter", own)
     elif bit == "h":
         return ("ownership", "owner", own)
+    elif bit == "b":
+        return ("ownership", "owner", own)
     elif bit == "wid":
-        return ("widowed", True, mar)
+        return ("widowed", True, wid)
     elif bit == "Mrs":
         return ("married", True, mar)
     elif bit.startswith("(") or bit.endswith(")"):
@@ -117,29 +132,41 @@ def recognize(bit):
         return ("first", bit, ini)
     elif bit.isdigit():
         return ("number", bit, num)
-    elif bit == "rd":
+    elif bit.lower() == "rd":
         bit = "Rd"
         return ("strsuffix", bit, suf)
-    elif bit == "ct":
+    elif bit.lower() == "ct":
         bit = "Ct"
         return ("strsuffix", bit, suf)
-    elif bit == "st":
+    elif bit.lower() == "st":
         bit = "St"
         return ("strsuffix", bit, suf)
-    elif bit == "pk":
+    elif bit.lower() == "pk":
         bit = "Pk"
         return ("strsuffix", bit, suf)
-    elif bit == "av":
+    elif bit.lower() == "av":
         bit = "Ave"
         return ("strsuffix", bit, suf)
-    elif bit == "pi":
+    elif bit.lower() == "pi":
         bit = "Pl"
         return ("strsuffix", bit, suf)
-    elif bit == "sq"
+    elif bit.lower() == "sq":
         bit = "Sq"
         return ("strsuffix", bit, suf)
-    elif bit == "ter"
+    elif bit.lower() == "ter":
         bit = "Ter"
         return ("strsuffix", bit, suf)
+    elif bit.lower() == "dr":
+        bit = "Dr"
+        return ("strsuffix", bit, suf)
+    elif bit.lower() == "la":
+        bit = "Ln"
+        return ("strsuffix", bit, suf)
+    elif bit.capitalize() in neighabbr:
+        return ("nh", neighabbr[bit.capitalize()], nei)
     else:
         return None
+
+def num_addresses(line):
+    addr_pattern = r"\b\d+\b"
+    return re.findall(addr_pattern, line)

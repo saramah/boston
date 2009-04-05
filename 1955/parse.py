@@ -1,254 +1,181 @@
-"""
-parse.py
-
-Putting data from the 1955 Boston Directory into a useful format. Run
-preprocessor.py first, as it will increase the accuracy with which we
-can pull useful information from the OCR'd text.
-
-Invariants of data:
-    - at most 1 name per line
-    - every line has a firstname, a number, and a streetname
-    - if neighborhood is not given, address is in Boston proper
-
-"""
-
-# at most 1 name per line
-# [lastname] firstname [initial] [Mrs] [(wifename)] [profession] [wid] [homeowner status] number streetname [neighborhood]
-
 import re
 import sys
-from helpers import * 
-    
-#####build dictionaries
-#last names, male/female first names, streets, neighborhoods
-#neighborhood abbreviations, name abbreviations
-lnames = build_dictionary("../dict/lastnames.txt", False)
-fnames = build_dictionary("../dict/firstnames.txt", False)
-streets = build_dictionary("../dict/streetnames.txt", False)
-nhoods = build_dictionary("../dict/neighborhoods.txt", False)
-nameabbr = build_dictionary("../dict/firstabbr.txt", True)
-strabbr = build_dictionary("../dict/strabbr.txt", True)
-neighabbr = build_dictionary("../dict/neighabbr.txt", True)
+from helpers import *
 
 lines, errors, broken, died = [], [], [], []
-
+last_name = ""
+last_entry = {}
 
 with open(sys.argv[1]) as infile:
-    last_name = ""
-    for line_number, line in enumerate(infile):
-        if line_number % 1000 is 0:
-            print line_number
-        #skip lines of people who died, they lack address information
-        #and so aren't useful for what we want. we'll hold onto them
-        #anyway in died, just in case this info comes in handy later
+    for line_no, line in enumerate(infile):
+        line = line.strip()
+        num_addr = num_addresses(line)
         if re.search(r'\bdied\b', line):
-            died.append("%d %s lastname: %s" % (line_number, line.strip(), last_name))
+            died.append("%d %s lastname: %s" % (line_no+1, line, last_name))
             continue
-        #if the line contains one of the invalid characters, error the line.
+        if re.search(r'\bsee\b', line):
+            line = line.split()
+            potential_lname = ""
+            for bit in line:
+                if bit == "see":
+                    break
+                potential_lname += bit.lower()
+            potential_lname = potential_lname.capitalize()
+            if valid_jump(last_name, potential_lname):
+                last_name = potential_lname
+            else:
+                broken.append("%d %s BAD JUMP" % (line_no+1, line))
+            continue
         if find_errors(line):
-            broken.append("%d %s CONTAINS INVALID CHARS" % (line_number, line.strip()))
+            broken.append("%d %s INVALID CHARS" % (line_no+1, line))
             continue
+        if len(num_addr) > 2:
+            errors.append("%d %s EXCESS NUMBERS" % (line_no+1, line))
 
         entry = {}
-        last_chomp = -1
-        last_entry = {}
         lineiter = line.split().__iter__()
+        last_chomp = -1
         try:
-            #first bit in the line.
-            #   -uppercased lname header (continuation)
-            #   -subline
-            #   -singleton/first instance of lname
-            chomp = lineiter.next() 
-            #lastname
-            #XXX Co H en vs Cohig see Cohen, Cohane only grabs Co from
-            #the first one, we'd like Cohen if possible
+            chomp = lineiter.next()
+            #if line starts with a last name, then grab the
+            #first name after it as well
             if chomp.capitalize() in lnames:
                 chomp = chomp.capitalize()
                 if valid_jump(last_name, chomp):
                     last_name = chomp
                     last_chomp = las
                 else:
-                    broken.append("%d %s BAD JUMP" % (line_number+1, line.strip()))
+                    broken.append("%d %s BAD JUMP" % (line_no+1, line))
                     continue
-            #firstname
-            if chomp.startswith("\x97"):
-                first = chomp[1:].capitalize()
-                if first.capitalize() in nameabbr:
-                    entry["first"] = nameabbr[first]
-                else:
-                    entry["first"] = first
-                entry["last"] = last_name
-                if len(first) is 1:
-                    last_chomp = ini
-                else:
-                    last_chomp = fir
-            #at the moment, we're not handling continued lines, 
-            #which is more than half of the errors list
-            if last_chomp is -1:
-#DEBUG                lines.append("%d %s" % (line_number, line.strip()))
-                errors.append("%d %s UNHANDLED PREFIX" % (line_number+1, line.strip()))
-                continue
-            #2nd bit on line
-            #   -first name
-            #   -initial, part of first name
-            #   -spouse name
-            #   -profession
-            #   -marital status
-            #   
-            chomp = lineiter.next()
-
-            #if the last thing we saw was a lastname,
-            #then the next thing must be a firstname
-            if last_chomp is las:
-                first = chomp.capitalize().strip(",")
+                
+                chomp = lineiter.next()
+    
+                first = chomp.capitalize()
                 if first in nameabbr:
                     entry["first"] = nameabbr[first]
                 elif first in fnames:
                     entry["first"] = first
                 else:
-                    errors.append("%d %s NO NAME" % (line_number+1, line.strip()))
+                    errors.append("%d %s UNRECOGNIZED NAME" % (line_no+1, line))
                     continue
                 entry["last"] = last_name
                 last_chomp = fir
-                chomp = lineiter.next()
-            #if the last thing we say was a firstname, 
-            #next could be one of five things:
-            #   -spouse name
-            #   -profession
-            #   -initial
-            #   -own/rent ('r'enter, 'h'ouseholder)
-            #   -"Mrs"
-            broke = False
-            #XXX this misses the case when there is no street number, just
-            # a street.
-            while(not chomp.isdigit()):
+            #otherwise we've got a subentry, so we should have the
+            #last name from the last line
+            elif chomp.startswith("\x97"):
+                first = chomp[1:].capitalize()
+                if first in nameabbr:
+                    first = nameabbr[first]
+                entry["first"] = first
+                entry["last"] = last_name
+                if len(first) is 1:
+                    last_chomp = ini
+                else:
+                    last_chomp = fir
+            #if it's not a lastname or a subentry, then it's a line
+            #we should have handled in our preprocessor; mark it.
+            if last_chomp is -1:
+                errors.append("%d %s BAD PREFIX" % (line_no+1, line))
+                continue
+
+            chomp = lineiter.next()
+            entry["nh"] = "Boston"
+            entry["street"] = "St"
+            #handling everything else.
+            while True:
                 tup = recognize(chomp)
                 if tup is None:
                     if "prof" in entry:
-                        entry["prof"] = entry["prof"] + " " + chomp
+                        entry["prof"] += " " + chomp
                     else:
                         entry["prof"] = chomp
                     last_chomp = pro
                 else:
-                    #initial is special case; need to tack it onto entry["first"]
+                    #first name initial
                     if tup[2] is ini:
-                        entry["first"] = entry["first"] + " " + chomp
+                        entry[tup[0]] += " " + tup[1]
+                        last_chomp = ini
+                    #spousal entry
                     elif tup[2] is spo:
-                        chomp = tup[1]
-                        if chomp.capitalize() in nameabbr:
-                            chomp = nameabbr[chomp.capitalize()]
-                        if chomp.capitalize() in fnames:
+                        chomp = tup[1].capitalize()
+                        if chomp in nameabbr:
+                            chomp = nameabbr[chomp]
+                        elif chomp in fnames:
                             if "spouse" in entry:
-                                entry["spouse"] = entry["spouse"] + " " + chomp
+                                entry["spouse"] += " " + chomp
                             else:
                                 entry["spouse"] = chomp
                         else:
-                            errors.append("%d %s INVALID SPOUSENAME" % (line_number+1, line.strip()))
-                            broke = True
+                            errors.append("%d %s INVALID SPOUSE" % (line_no+1, line))
                             break
-                    #XXX widowed is also a special case, deceased husband's name might
-                    #appear directly after this
+                        last_chomp = spo
+                    #widowed entry; deceased's name optionally follows
+                    #XXX still not working quite right
+                    elif tup[2] is wid:
+                        entry[tup[0]] = tup[1]
+                        chomp = lineiter.next().capitalize()
+                        if chomp in nameabbr:
+                            chomp = nameabbr[chomp]
+                        if chomp in fnames:
+                            entry["spouse"] = chomp
+                        else: continue
+                        last_chomp = wid
+                    #we hit a street address
+                    elif tup[2] is num:
+                        street = "street"
+                        strsuffix = "strsuffix"
+                        if tup[1] in num_addr and len(num_addr) is 2 and num_addr.index(tup[1]) is 0:
+                            entry["b_number"] = tup[1]
+                            entry["b_strsuffix"] = "St"
+                            street = "b_street"
+                            strsuffix = "b_strsuffix"
+                        else:
+                            entry["number"] = tup[1]
+                        #grab the street name
+                        chomp = lineiter.next()
+                        if chomp.capitalize() in strabbr:
+                            chomp = strabbr[chomp.capitalize()]
+                        entry[street] = chomp
+                        if chomp not in streets:
+                            while entry[street] not in streets:
+                                chomp = lineiter.next()
+                                tup = recognize(chomp)
+                                if tup is not None:
+                                    entry[tup[0]] = tup[1]
+                                    last_chomp = tup[2]
+                                    break
+                                entry[street] += " " + chomp
+                        chomp = lineiter.next()
+                        tup = recognize(chomp)
+                        if tup is not None and tup[2] is suf:
+                            entry[strsuffix] = tup[1]
+                        else: continue
                     else:
                         entry[tup[0]] = tup[1]
-                    last_chomp = tup[2]
+                        last_chomp = tup[2]
                 chomp = lineiter.next()
-
-            if broke:
-                continue
-            entry["number"] = chomp
-
-            chomp = lineiter.next()
-            #expanding direction names for streets
-            if chomp == "E":
-                chomp = "East " + lineiter.next().strip()
-            elif chomp == "S":
-                chomp = "South " + lineiter.next().strip()
-            elif chomp == "W":
-                chomp = "West " + lineiter.next().strip()
-            elif chomp == "N":
-                chomp = "North " + lineiter.next().strip()
-            
-            #picking out the street name
-            if chomp.capitalize() in strabbr:
-                entry["street"] = strabbr[chomp.capitalize()]
-            entry["street"] = chomp
-            last_chomp = str
-            #default street suffix of St
-            entry["strsuffix"] = "St"
-
-            chomp = lineiter.next()
-
-            tup = recognize(chomp)
-            if tup is None:
-                #second half of streetname?
-                if "street" in entry:
-                    whole = entry["street"] + " " + chomp
-                    if whole.title() in strabbr:
-                        entry["street"] = whole
-                    elif whole.title() in streets:
-                        entry["street"] = whole
-                    last_chomp = str
-                elif chomp.capitalize() in neighabbr:
-                    entry["nh"] = neighabbr[chomp.capitalize()]
-                    last_chomp = nei
-                else:
-                    errors.append("%d %s UNKNOWN CHOMP" % (line_number+1, line.strip()))
-                    continue
-            else:
-                entry[tup[0]] = tup[1]                
-                last_chomp = tup[2]
-
-            #default neighborhood
-            entry["nh"] = "Boston"
-
-            #keep going until we hit an exception
-            while True:
-                chomp = lineiter.next()
-                tup = recognize(chomp)
-                if tup is None:
-                    if chomp.capitalize() in neighabbr:
-                        entry["nh"] = neighabbr[chomp.capitalize()]
-                        last_chomp = nei
-                    else:
-                        errors.append("%d %s NOT THE END?\n%d %s" % 
-                                (line_number+1, line.strip(), line_number+1, entry))
-                        break
-                else:
-                    entry[tup[0]] = tup[1]
-                    last_chomp = tup[2]
-
-        except StopIteration:  
+        except StopIteration:
             pass
-        #if an entry doesn't have at least a firstname, a lastname, and an address,
-        #error it so we can figure out why.
-        if "first" not in entry or "last" not in entry or "street" not in entry:
-            errors.append("%d %s INCOMPLETE ENTRY\n%d %s" % 
-                    (line_number+1, line.strip(), line_number+1, entry))
-            continue
 
-        lines.append("%d %s" % (line_number+1, entry))
+        if "first" not in entry or "last" not in entry or "street" not in entry:
+            errors.append("%d %s INCOMPLETE \n%d %s" % (line_no+1, line, line_no+1, entry))
+            continue
+        lines.append("%d %s" % (line_no+1, entry))
 
 for good in lines:
     print good
 
 print "ERROR'D"
-for xx in errors:
-    print xx
-
-#print "BROKEN"
-#for x in broken:
-#    print x
+for error in errors:
+    print error
 
 llength = len(lines)
 elength = len(errors)
 blength = len(broken)
 total = llength + elength + blength
 
-print "good lines: %d" % (llength)
-print "fixable lines: %d" % (elength)
-print "broken lines: %d" % (blength)
+print "good: %d" % (llength)
+print "fixable: %d" % (elength)
+print "broken: %d" % (blength)
 print total
-print "error rate: %f" % (float(blength + elength)/total)
-#print "DIED"
-#for dead in died:
-#    print dead
+print "error rate: %f" % (float(blength+elength)/total)
