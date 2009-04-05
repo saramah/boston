@@ -18,6 +18,7 @@ num = 8 #house number
 st = 9 #street name
 suf = 10 #street suffix
 nei = 11 #neighborhood
+bus = 12 #business name
 
 def build_dictionary(path, kv):
     """

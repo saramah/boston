@@ -106,8 +106,14 @@ with open(sys.argv[1]) as infile:
                             else:
                                 entry["spouse"] = chomp
                         else:
-                            errors.append("%d %s INVALID SPOUSE" % (line_no+1, line))
-                            break
+                            business = chomp.strip("()")
+                            while not chomp.endswith(")"):
+                                chomp = lineiter.next()
+                                if chomp.endswith(")"):
+                                    business += " " + chomp.strip(")")
+                            entry["business"] = business
+                            last_chomp = bus
+                            continue
                         last_chomp = spo
                     #widowed entry; deceased's name optionally follows
                     #XXX still not working quite right
