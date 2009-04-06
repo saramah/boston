@@ -10,8 +10,9 @@ from helpers import *
 
 ntuple = tuple(build_dictionary("../dict/neighabbr.txt", True).keys())
 
-with open(sys.argv[1]) as infile:
-    with open(sys.argv[2], 'w') as outfile:
+def process(fromfile):
+    processed = []
+    with open(fromfile) as infile:
         prev_line = ""
         condense = False
         lastname = ""
@@ -26,7 +27,7 @@ with open(sys.argv[1]) as infile:
             #converting subentries to a consistent start
             if line.capitalize() in neighabbr:
                 prev_line += " " + line
-                outfile.write(prev_line + '\n')
+                processed.append(prev_line + '\n')
                 continue
             if line.startswith("--"):
                 line = "\x97%s" %(line[2:])
@@ -38,7 +39,7 @@ with open(sys.argv[1]) as infile:
                 if not start in ntuple and (line.startswith("\x97") 
                         or start.isupper() or start in lnames):
                     #false alarm, new entry or lname header
-                    outfile.write(prev_line + '\n')
+                    processed.append(prev_line + '\n')
                 else:
                     line = condense_lines(prev_line, [line])
                 condense = False
@@ -54,5 +55,6 @@ with open(sys.argv[1]) as infile:
                 condense = True
                 #wait to write the line until we've condensed it
                 continue
-            outfile.write(line + '\n')
+            processed.append(line + '\n')
+    return processed
 
