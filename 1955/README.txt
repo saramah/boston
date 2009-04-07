@@ -1,9 +1,8 @@
-Preprocess data first by
+To use the parser, simply run
 
-python preprocessor.py [infile] [outfile]
+python parse.py [infile]
 
-Then run parse.py.
+where [infile] is the file that you wish to parse.
 
-python parse.py [outfile]
 
 
