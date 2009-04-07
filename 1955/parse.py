@@ -12,12 +12,25 @@ last_entry = {}
 #preprocess the file before we start parsing it
 preprocessed = preprocessor.process(sys.argv[1])
 
+with open("out", 'w') as outfile:
+    for x in preprocessed:
+        outfile.write(x)
+
+#getting down to the actual parsing
 for line_no, line in enumerate(preprocessed):
     line = line.strip()
-    num_addr = num_addresses(line)
+    #if a line has invalid characters in it, we're not dealing with it.
+    #XXX wishlist: hook in a levenshtein distance calculator to fix
+    #words with invalid characters.
+    if find_errors(line):
+        broken.append("%d %s INVALID CHARS" % (line_no+1, line))
+        continue
+    #stripping out death lines, these don't contain addresses
     if re.search(r'\bdied\b', line):
         died.append("%d %s lastname: %s" % (line_no+1, line, last_name))
         continue
+    #some lastname headers have form "Cohig see Cohen, Cofen" etc
+    #this just takes the first part of that line.
     if re.search(r'\bsee\b', line):
         line = line.split()
         potential_lname = ""
@@ -31,11 +44,12 @@ for line_no, line in enumerate(preprocessed):
         else:
             broken.append("%d %s BAD JUMP" % (line_no+1, line))
         continue
-    if find_errors(line):
-        broken.append("%d %s INVALID CHARS" % (line_no+1, line))
-        continue
+    num_addr = num_addresses(line)
+#    print "%d %s" % (line_no+1, num_addr)
+    #XXX not needed after we make num_addresses in helpers.py recognize
+    #addresses properly
     if len(num_addr) > 2:
-        errors.append("%d %s EXCESS NUMBERS" % (line_no+1, line))
+        errors.append("%d %s too many addresses" % (line_no+1, line))
 
     entry = {}
     lineiter = line.split().__iter__()

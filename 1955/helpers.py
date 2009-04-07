@@ -163,11 +163,26 @@ def recognize(bit):
     elif bit.lower() == "la":
         bit = "Ln"
         return ("strsuffix", bit, suf)
+    elif bit.lower() == "hway":
+        bit = "Hway"
+        return ("strsuffix", bit, suf)
     elif bit.capitalize() in neighabbr:
         return ("nh", neighabbr[bit.capitalize()], nei)
     else:
         return None
 
 def num_addresses(line):
-    addr_pattern = r"\b\d+\b"
-    return re.findall(addr_pattern, line)
+    #matches one or more standalone digits followed by one
+    #or more spaces followed by one to four words (street) followed
+    #by 0 or more spaces followed by 0 or 1 optional street suffix
+    #XXX don't match r or h by itself after the street name
+    #XXX match rm or rms to room
+    #XXX don't match neighborhoods
+    pattern = r'\b(\d+)\s+((?:(?:\w+\s*)(?!\b(?:st|pk|rd|ct|av|la|dr|ter|pl|pi|hway)\b)){1,4})\s*(st|pk|rd|ct|av|la|dr|ter|pl|pi|hway)?'
+    return re.findall(pattern, line)
+
+
+
+
+
+

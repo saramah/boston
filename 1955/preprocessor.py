@@ -4,7 +4,8 @@ preprocessor.py
 Cleans up 1955 data by attempting to rejoin split lines before
 actual parsing begins
 """
-
+#XXX some lines are repeated twice!
+import re
 import sys
 from helpers import * 
 
@@ -17,8 +18,8 @@ def process(fromfile):
         condense = False
         lastname = ""
         for line in infile:
-            #ignore empty lines
-            if line.isspace():
+            #ignore died lines and empty lines
+            if re.search(r'\bdied\b', line) or line.isspace():
                 continue
             #stripping whitespace, commas, and periods
             line = line.strip()
