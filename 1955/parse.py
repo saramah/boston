@@ -44,7 +44,12 @@ for line_no, line in enumerate(preprocessed):
         else:
             broken.append("%d %s BAD JUMP" % (line_no+1, line))
         continue
-    num_addr = num_addresses(line)
+    temp = num_addresses(line)
+    addresses = {}
+    for x in temp:
+        addresses[x[0]] = x
+    num_addr = len(addresses)
+
 #    print "%d %s" % (line_no+1, num_addr)
     entry = {}
     lineiter = line.split().__iter__()
@@ -82,13 +87,13 @@ for line_no, line in enumerate(preprocessed):
                 first = nameabbr[first]
             entry["first"] = first
             entry["last"] = last_name
-            if len(first) is 1:
+            if len(first) == 1:
                 last_chomp = ini
             else:
                 last_chomp = fir
         #if it's not a lastname or a subentry, then it's a line
         #we should have handled in our preprocessor; mark it.
-        if last_chomp is -1:
+        if last_chomp == -1:
             errors.append("%d %s BAD PREFIX" % (line_no+1, line))
             continue
 
@@ -106,11 +111,11 @@ for line_no, line in enumerate(preprocessed):
                 last_chomp = pro
             else:
                 #first name initial
-                if tup[2] is ini:
+                if tup[2] == ini:
                     entry[tup[0]] += " " + tup[1]
                     last_chomp = ini
                 #spousal entry
-                elif tup[2] is spo:
+                elif tup[2] == spo:
                     chomp = tup[1].capitalize()
                     if chomp in nameabbr:
                         chomp = nameabbr[chomp]
@@ -131,7 +136,7 @@ for line_no, line in enumerate(preprocessed):
                     last_chomp = spo
                 #widowed entry; deceased's name optionally follows
                 #XXX still not working quite right
-                elif tup[2] is wid:
+                elif tup[2] == wid:
                     entry[tup[0]] = tup[1]
                     chomp = lineiter.next().capitalize()
                     if chomp in nameabbr:
@@ -141,35 +146,49 @@ for line_no, line in enumerate(preprocessed):
                     else: continue
                     last_chomp = wid
                 #we hit a street address
-                elif tup[2] is num:
-                    street = "street"
-                    strsuffix = "strsuffix"
-                    if tup[1] in num_addr and len(num_addr) is 2 and num_addr.index(tup[1]) is 0:
-                        entry["b_number"] = tup[1]
-                        entry["b_strsuffix"] = "St"
-                        street = "b_street"
-                        strsuffix = "b_strsuffix"
-                    else:
-                        entry["number"] = tup[1]
-                    #grab the street name
-                    chomp = lineiter.next()
-                    if chomp.capitalize() in strabbr:
-                        chomp = strabbr[chomp.capitalize()]
-                    entry[street] = chomp
-                    if chomp not in streets:
-                        while entry[street] not in streets:
-                            chomp = lineiter.next()
-                            tup = recognize(chomp)
-                            if tup is not None:
-                                entry[tup[0]] = tup[1]
-                                last_chomp = tup[2]
-                                break
-                            entry[street] += " " + chomp
-                    chomp = lineiter.next()
-                    tup = recognize(chomp)
-                    if tup is not None and tup[2] is suf:
-                        entry[strsuffix] = tup[1]
-                    else: continue
+                elif tup[2] == num:
+                    pass
+#                    consume = 0
+#                    number = tup[1]
+#                    entry["strsuffix"] = "St"
+                    #if we didn't recognize this address with the regex, then
+                    #it's very likely not actually part of an address.
+#                    if number not in addresses:
+#                        errors.append("%d %s STRAY NUMBER" % (line_no+1, line))
+#                        break
+#
+#                    address = addresses[number]
+#                    if "street" in entry:
+#                        entry["b_street"] = entry["street"]
+#                        entry["b_number"] = entry["number"]
+#                        entry["b_strsuffix"] = entry["strsuffix"]
+#                    entry["number"] = number
+#                    consume += 1
+#                    if address[1] in strabbr:
+#                        entry["street"] = strabbr[address[1]]
+#                        consume += 1
+#                    elif address[1] in streets:
+#                        entry["street"] = address[1]
+#                        consume += 1
+#                    else:
+#                        potential_street = ""
+#                        for x in address[1].split():
+#                            if x.capitalize() in neighabbr or x.capitalize() in nhoods or x == "h" or x == "r":
+#                                break
+#                            potential_street += " " + x
+#                            if potential_street.strip() in strabbr:
+#                                entry["street"] = strabbr[x]
+#                            elif potential_street.strip() in streets:
+#                                entry["street"] = potential_street.strip()
+#                            consume += 1
+#                        entry["street"] = potential_street
+#                    if address[2] != "":
+#                        entry["strsuffix"] = address[2]
+#                        consume += 1
+#                    for x in range(consume):
+#                        chomp = lineiter.next()
+#                    last_chomp = suf
+#                    continue
                 else:
                     entry[tup[0]] = tup[1]
                     last_chomp = tup[2]
@@ -178,7 +197,7 @@ for line_no, line in enumerate(preprocessed):
         pass
 
     if "first" not in entry or "last" not in entry or "street" not in entry:
-        errors.append("%d %s INCOMPLETE \n%d %s" % (line_no+1, line, line_no+1, entry))
+        errors.append("%d %s INCOMPLETE \n%d %s\n%s" % (line_no+1, line, line_no+1, entry, addresses))
         continue
     lines.append("%d %s" % (line_no+1, entry))
 

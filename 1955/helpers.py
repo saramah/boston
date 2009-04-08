@@ -34,7 +34,7 @@ def build_dictionary(path, kv):
     with open(path) as infile:
         for line in infile:
             val = True
-            if kv is False:
+            if not kv:
                 key = line.strip().title()
             else:
                 line = line.split()
@@ -131,6 +131,8 @@ def recognize(bit):
         return ("first", bit, ini)
     elif bit == "II" or bit == "III":
         return ("first", bit, ini)
+    elif bit =="jr":
+        return ("first", bit, ini)
     elif bit.isdigit():
         return ("number", bit, num)
     elif bit.lower() == "rd":
@@ -176,8 +178,9 @@ def num_addresses(line):
     #or more spaces followed by one to four words (street) followed
     #by 0 or more spaces followed by 0 or 1 optional street suffix
     #XXX don't match r or h by itself after the street name
-    #XXX match rm or rms to room
     #XXX don't match neighborhoods
+    #both of these bugs are being moderated in parse.py via python
+    #instead of trying to fix it in the regex.
     pattern = r'\b(\d+)\s+((?:(?:\w+\s*)(?!\b(?:st|pk|rd|ct|av|la|dr|ter|pl|pi|hway)\b)){1,4})\s*(st|pk|rd|ct|av|la|dr|ter|pl|pi|hway)?'
     return re.findall(pattern, line)
 

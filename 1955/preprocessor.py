@@ -63,7 +63,7 @@ def process(fromfile):
                 continue
             processed.append(line + '\n')
     #if we hit EOF on a condensed line, write out the line anyway
-    if condense is True:
+    if condense:
         processed.append(prev_line)
     return processed
 
