@@ -184,4 +184,5 @@ def num_addresses(line):
     pattern = r'\b(\d+)\s+((?:(?:\w+\s*)(?!\b(?:st|pk|rd|ct|av|la|dr|ter|pl|pi|hway)\b)){1,4})\s*(st|pk|rd|ct|av|la|dr|ter|pl|pi|hway)?'
     return re.findall(pattern, line)
 
-
+def parse_addr(line):
+    pass
