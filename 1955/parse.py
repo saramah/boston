@@ -59,6 +59,7 @@ for line_no, line in enumerate(preprocessed):
         #if line starts with a last name, then grab the
         #first name after it as well
         if chomp.capitalize() in lnames:
+            print "%d %s from\n%s" % (line_no+1, chomp, line)
             chomp = chomp.capitalize()
             if valid_jump(last_name, chomp):
                 last_name = chomp
