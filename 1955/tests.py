@@ -19,6 +19,38 @@ class TestFindErrors(unittest.TestCase):
     def testInvalid(self):
         self.assertTrue(helpers.find_errors("$o many pro3$#blems"))
 
+class TestBuildDictionary(unittest.TestCase):
+    pass
+
+class TestCondenseLines(unittest.TestCase):
+    def testBase(self):
+        self.assertEqual(helpers.condense_lines("The", ["whale"]), "The whale")
+
+    def testHyphen(self):
+        self.assertEqual(helpers.condense_lines("Win-", ["chester"]), "Winchester")
+
+
+class TestRecognize(unittest.TestCase):
+    def testSuffix(self):
+        sufs = {"la":"Ln", "ct":"Ct", "st":"St", "rd":"Rd", "ter":"Ter", "dr":"Dr", "hway":"Hway", "sq":"Sq", "pl":"Pl", "pi":"Pl", "pk":"Pk"}
+        for suffix in sufs:
+            self.assertEqual(helpers.recognize(suffix), ("strsuffix", sufs[suffix], 10))
+    
+    def testOwner(self):
+        owners = {"h":"owner", "r":"renter", "b":"owner"}
+        for atom in owners:
+            self.assertEqual(helpers.recognize(atom), ("ownership", owners[atom], 7))
+
+    def testWidowed(self):
+        self.assertEqual(helpers.recognize("wid"), ("widowed", True, 6))
+
+    def testMarried(self):
+        self.assertEqual(helpers.recognize("Mrs"), ("married", True, 5))
+
+    def testSpouse(self):
+        self.assertEqual(helpers.recognize("(Marie)"), ("spouse", "Marie", 3))
+        self.assertEqual(helpers.recognize("(Anne S)"), ("spouse", "Anne S", 3))
+
 
 class TestAddresses(unittest.TestCase):
     def testBase(self):

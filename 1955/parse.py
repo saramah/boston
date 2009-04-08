@@ -99,6 +99,7 @@ for line_no, line in enumerate(preprocessed):
             continue
 
         chomp = lineiter.next()
+    
         entry["nh"] = "Boston"
         entry["strsuffix"] = "St"
         #handling everything else.
@@ -117,6 +118,8 @@ for line_no, line in enumerate(preprocessed):
                     last_chomp = ini
                 #spousal entry
                 elif tup[2] == spo:
+                    while not chomp.endswith(")"):
+                        chomp += " " + lineiter.next()
                     chomp = tup[1].capitalize()
                     if chomp in nameabbr:
                         chomp = nameabbr[chomp]
