@@ -10,6 +10,7 @@ import sys
 from helpers import * 
 
 ntuple = tuple(build_dictionary("../dict/neighabbr.txt", True).keys())
+stuple = tuple(build_dictionary("../dict/streetnames.txt", False))
 
 def process(fromfile):
     processed = []
@@ -19,9 +20,14 @@ def process(fromfile):
         lastname = ""
         for line in infile:
             #ignore died lines and empty lines
-            if re.search(r'\bdied\b', line) or line.isspace():
+            if re.search(r'\bdied\b', line):
                 continue
-            #stripping whitespace, commas, and periods
+            #purging room numbers
+            for room in re.findall(r'(?:\brms\s\d+(?:\s|-)\d+)|(?:\brm\s+\d+)', line):
+                line = line.replace(room, "")
+            if line.isspace():
+                continue
+            #stripping leading/trailing whitespace, commas, and periods
             line = line.strip()
             line = line.replace(",","")
             line = line.replace(".","")
@@ -29,6 +35,8 @@ def process(fromfile):
             if line.capitalize() in neighabbr:
                 prev_line += " " + line
                 processed.append(prev_line + '\n')
+                #fixing doubling up bug
+                condense = False
                 continue
             if line.startswith("--"):
                 line = "\x97%s" %(line[2:])
@@ -37,8 +45,7 @@ def process(fromfile):
             #condensing entries to one line
             if condense:
                 start = line.split()[0]
-                if not start in ntuple and (line.startswith("\x97") 
-                        or start.isupper() or start in lnames):
+                if not (start in ntuple) and not (start in stuple) and (line.startswith("\x97") or start.isupper() or start in lnames):
                     #false alarm, new entry or lname header
                     processed.append(prev_line + '\n')
                 else:
@@ -49,13 +56,14 @@ def process(fromfile):
                 condense = True
                 continue
             #a line needs to be condensed if it doesn't end with a neighborhood
-            #XXX this doesn't work with Boston entries, as entries in boston proper
-            #don't end with any neighborhood
-            if not line.endswith(ntuple):
+            if not line.endswith(ntuple) or not line.endswith(stuple):
                 prev_line = line
                 condense = True
                 #wait to write the line until we've condensed it
                 continue
             processed.append(line + '\n')
+    #if we hit EOF on a condensed line, write out the line anyway
+    if condense is True:
+        processed.append(prev_line)
     return processed
 

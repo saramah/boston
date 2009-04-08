@@ -182,7 +182,3 @@ def num_addresses(line):
     return re.findall(pattern, line)
 
 
-
-
-
-

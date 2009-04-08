@@ -46,11 +46,6 @@ for line_no, line in enumerate(preprocessed):
         continue
     num_addr = num_addresses(line)
 #    print "%d %s" % (line_no+1, num_addr)
-    #XXX not needed after we make num_addresses in helpers.py recognize
-    #addresses properly
-    if len(num_addr) > 2:
-        errors.append("%d %s too many addresses" % (line_no+1, line))
-
     entry = {}
     lineiter = line.split().__iter__()
     last_chomp = -1
@@ -99,7 +94,7 @@ for line_no, line in enumerate(preprocessed):
 
         chomp = lineiter.next()
         entry["nh"] = "Boston"
-        entry["street"] = "St"
+        entry["strsuffix"] = "St"
         #handling everything else.
         while True:
             tup = recognize(chomp)
