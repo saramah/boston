@@ -32,20 +32,21 @@ def process(fromfile):
             line = line.replace(",","")
             line = line.replace(".","")
             #converting subentries to a consistent start
-            if line.capitalize() in nhabbr:
-                prev_line += " " + line
-                processed.append(prev_line + '\n')
-                #fixing doubling up bug
-                condense = False
-                continue
             if line.startswith("--"):
                 line = "\x97%s" %(line[2:])
             elif line.startswith(("_", "-")):
                 line = "\x97%s" %(line[1:])
+            if line.capitalize() in nhabbr:
+                prev_line += " " + line
+                processed.append(prev_line + '\n')
+                #we already condensed the lines right here, so we don't
+                #need to recondense them again
+                condense = False
+                continue
             #condensing entries to one line
             if condense:
                 start = line.split()[0].lower()
-                if not (start in ntuple) and not (start in stuple) and (line.startswith("\x97") or start.isupper() or start in lnames):
+                if not prev_line.endswith("-") and not (start in ntuple) and not (start in stuple) and (line.startswith("\x97") or start.isupper() or start in lnames):
                     #false alarm, new entry or lname header
                     processed.append(prev_line + '\n')
                 else:
