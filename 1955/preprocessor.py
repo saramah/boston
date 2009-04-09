@@ -1,3 +1,4 @@
+from __future__ import with_statement
 """
 preprocessor.py
 
@@ -43,7 +44,7 @@ def process(fromfile):
                 line = "\x97%s" %(line[1:])
             #condensing entries to one line
             if condense:
-                start = line.split()[0]
+                start = line.split()[0].lower()
                 if not (start in ntuple) and not (start in stuple) and (line.startswith("\x97") or start.isupper() or start in lnames):
                     #false alarm, new entry or lname header
                     processed.append(prev_line + '\n')
@@ -55,7 +56,7 @@ def process(fromfile):
                 condense = True
                 continue
             #a line needs to be condensed if it doesn't end with a neighborhood
-            if not line.endswith(ntuple) or not line.endswith(stuple):
+            if not line.lower().endswith(ntuple) or not line.lower().endswith(stuple):
                 prev_line = line
                 condense = True
                 #wait to write the line until we've condensed it

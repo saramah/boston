@@ -157,6 +157,7 @@ def parse_addr(line):
     words = map(str.lower, line.split())
     pos = len(words) - 1
     prefix = ''
+    lookbehind = ('', 0)
     repeat_street = False
     result = {'strsuffix': 'St', 'nh': 'Boston',
               'b_strsuffix': 'St', 'b_nh': 'Boston'}
@@ -166,33 +167,77 @@ def parse_addr(line):
         word = words[pos]
         word_prev = words[pos-1]
 
-        if word in nhabbr:
-            result[prefix+'nh'] = nhabbr[words[pos]]
-        if word in suffixes:
-            result[prefix+'strsuffix'] = word.capitalize()
-        elif word in ('h', 'r'):
-            result['owner'] = True if word=='h' else False
-        elif word == 'do':
-            repeat_street = True
-        elif word in streets or word in strabbr:
-            if word in strabbr:
-                street = strabbr[word].capitalize()
-            else:
-                street = word.capitalize()
-            if word_prev in ('n', 's', 'e', 'w'):
-                street = "%s %s" % (word_prev.capitalize(), street)
-                pos -= 1
-            result[prefix+'street'] = street
-        elif word.isdigit():
-            result[prefix+'number'] = word
-            prefix = 'b_'       
+        #print 'w [%s] pos [%s] res [%s]' % (word, pos, result)
+
+        # Try to greedy-match a street name up to 5 words long (incl. this)
+        # Note we're still not looking at the first two words of the line.
+        start = 2 if (pos-4)<2 else pos-4
+        for i in range(start, pos):
+            cur_match = ' '.join(words[i:pos+1])
+            if cur_match in streets:
+                if prefix+'street' not in result:
+                    result[prefix+'street'] = cur_match.title()
+                    pos = i
+                    break
+                elif not prefix and 'b_street' not in result:
+                    result['b_street'] = cur_match.title()
+                    pos = i
+                    break
+        else:
+            if word in nhabbr:
+                # If we find a NH before a street address,
+                # it belongs to the business street.
+                if 'street' in result:
+                    prefix = 'b_'
+                result[prefix+'nh'] = nhabbr[words[pos]]
+            elif word in suffixes:
+                # If we find a suffix before a street address,
+                # it belongs to the business street.
+                if 'street' in result:
+                    prefix = 'b_'
+                result[prefix+'strsuffix'] = word.capitalize()
+            elif word in ('h', 'r'):
+                result['owner'] = True if word=='h' else False
+            elif word == 'do':
+                repeat_street = True
+            elif word.isdigit():
+                result[prefix+'number'] = word
+                prefix = 'b_'
+            # One-word street or abbreviated, skip first 2 words
+            elif pos>1 and (word in streets or word in strabbr):
+                if word in strabbr:
+                    street = strabbr[word].capitalize()
+                else:
+                    street = word.capitalize()
+                if word_prev in ('n', 's', 'e', 'w'):
+                    street = "%s %s" % (word_prev.capitalize(), street)
+                    pos -= 1
+                if not prefix+'street' in result:
+                    result[prefix+'street'] = street
+                elif not prefix and 'b_street' not in result:
+                    result['b_street'] = street
         pos -= 1
 
     if repeat_street:
-        result['street'] = result['b_street']
-    if 'b_street' in result and 'b_number' not in result:
-        del result['b_street']
+        # blah blah blah 350 Hanover do
+        # Copy street, (number), nh to b_
+        if not 'b_street' in result:
+            result['b_street'] = result['street']
+            result['b_nh'] = result['nh']
+            if 'number' in result:
+                result['b_number'] = result['number']
+        # 350 Hanover Rox 352 do
+        # copy (b_street), nh to street
+        else:
+            if not 'street' in result:
+                result['street'] = result['b_street']
+            result['nh'] = result['b_nh']
     if 'b_street' not in result:
         del result['b_nh']
         del result['b_strsuffix']
     return result
+
+if __name__ == '__main__':
+    line = "\x97Wm (Marie A) dept store h Hanover do"
+    print line
+    print parse_addr(line)
