@@ -45,9 +45,9 @@ for line_no, line in enumerate(preprocessed):
             broken.append("%d %s BAD JUMP" % (line_no+1, line))
         continue
 
-#    print "%d %s" % (line_no+1, line)
+    print "%d %s" % (line_no+1, line)
     addresses = parse_addr(line)
-#    print "%d %s" % (line_no+1, addresses)
+    print "%d %s" % (line_no+1, addresses)
 
     entry = {}
     lineiter = line.split().__iter__()
@@ -157,8 +157,9 @@ for line_no, line in enumerate(preprocessed):
                 if addresses is None:
                     errors.append("%d %s NO ADDRESS" % (line_no+1, line))
                     break
-                for atom in addresses:
-                    entry[atom] = addresses[atom]
+                print addresses
+                for key in addresses:
+                    entry[key] = addresses[key]
                 break
             else:
                 entry[tup[0]] = tup[1]

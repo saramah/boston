@@ -96,6 +96,8 @@ class TestAddresses(unittest.TestCase):
         self.assertEqual(dict_diff(helpers.parse_addr("\x97Wm (Marie A) dept store h Hanover do"), {'b_street':'Hanover', 'b_strsuffix':'St', 'b_nh':'Boston', 'owner':True, 'street':'Hanover', 'strsuffix':'St', 'nh':'Boston'}), None)
         self.assertEqual(dict_diff(helpers.parse_addr("\x97Wm (Marie A) dept store 173 Blue Hill av Rox h 250 Seaver do"), {'b_number':'173', 'b_street':'Blue Hill', 'b_strsuffix':'Av', 'b_nh':'Roxbury', 'owner':True, 'number':'250', 'street':'Seaver', 'strsuffix':'St', 'nh':'Roxbury'}), None)
 
+    def testInitialEntry(self):
+        self.assertEqual(dict_diff(helpers.parse_addr("Coglin Edw J emp United Farmers r 16 White cir st Wakefield"), {'owner':False, 'number':'16', 'street':'White Cir', 'strsuffix':'St', 'nh':'Wakefield'}), None)
 
 if __name__ == '__main__':
     unittest.main()
