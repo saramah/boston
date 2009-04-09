@@ -1,3 +1,4 @@
+from __future__ import with_statement
 """
 helpers.py
 
@@ -6,19 +7,19 @@ Helper functions for parse.py and preprocessor.py, 1955.
 import re
 
 #copied constants
-las = 0 #lastname
-fir = 1 #firstname
-ini = 2 #initial
-spo = 3 #spouse
-pro = 4 #profession
-mar = 5 #Mrs
-wid = 6 #widowed
-own = 7 #house ownership status
-num = 8 #house number
-st = 9 #street name
-suf = 10 #street suffix
-nei = 11 #neighborhood
-bus = 12 #business name
+LAST_NAME = 0
+FIRST_NAME = 1
+INITIAL = 2
+SPOUSE = 3
+PROFESSION = 4
+MRS = 5
+WIDOWED = 6
+OWNER = 7
+HOUSE_NUM = 8
+STREET = 9
+STREET_SUFFIX = 10
+NH = 11
+BUSINESS_NAME = 12
 
 def build_dictionary(path, kv):
     """
@@ -35,10 +36,10 @@ def build_dictionary(path, kv):
         for line in infile:
             val = True
             if not kv:
-                key = line.strip().title()
+                key = line.strip().lower()
             else:
                 line = line.split()
-                key = line[0].strip().capitalize()
+                key = line[0].strip().lower()
                 if len(line) > 1:
                     val = " ".join(line[1:]).strip()
             if key not in build:
@@ -54,8 +55,9 @@ streets = build_dictionary("../dict/streetnames.txt", False)
 nhoods = build_dictionary("../dict/neighborhoods.txt", False)
 nameabbr = build_dictionary("../dict/firstabbr.txt", True)
 strabbr = build_dictionary("../dict/strabbr.txt", True)
-neighabbr = build_dictionary("../dict/neighabbr.txt", True)
-
+nhabbr = build_dictionary("../dict/neighabbr.txt", True)
+suffixes = ['st', 'pk', 'rd', 'ct', 'av', 'la', 'dr', 'ter','pl','pi','hway']
+ 
 def condense_lines(line, linelist):
     """
     Condenses a list of lines into one line. Strips hyphens
@@ -107,82 +109,90 @@ def valid_jump(first, second):
         return True
 
 
-def recognize(bit):
+def recognize(atom):
     """
-    Recognizes the meaning of the bit passed in and returns
+    Recognizes the meaning of the atom passed in and returns
     a tuple; the first bit of the tuple is the key for the
     entry, while the second is the value, and the third is the
     value for last_chomp.
     """
-    if bit == "r":
-        return ("ownership", "renter", own)
-    elif bit == "h":
-        return ("ownership", "owner", own)
-    elif bit == "b":
-        return ("ownership", "owner", own)
-    elif bit == "wid":
-        return ("widowed", True, wid)
-    elif bit == "Mrs":
-        return ("married", True, mar)
-    elif bit.startswith("(") or bit.endswith(")"):
-        bit = bit.strip("()")
-        return ("spouse", bit, spo)
-    elif bit.isalpha() and len(bit) is 1:
-        return ("first", bit, ini)
-    elif bit == "II" or bit == "III":
-        return ("first", bit, ini)
-    elif bit =="jr":
-        return ("first", bit, ini)
-    elif bit.isdigit():
-        return ("number", bit, num)
-    elif bit.lower() == "rd":
-        bit = "Rd"
-        return ("strsuffix", bit, suf)
-    elif bit.lower() == "ct":
-        bit = "Ct"
-        return ("strsuffix", bit, suf)
-    elif bit.lower() == "st":
-        bit = "St"
-        return ("strsuffix", bit, suf)
-    elif bit.lower() == "pk":
-        bit = "Pk"
-        return ("strsuffix", bit, suf)
-    elif bit.lower() == "av":
-        bit = "Ave"
-        return ("strsuffix", bit, suf)
-    elif bit.lower() == "pi":
-        bit = "Pl"
-        return ("strsuffix", bit, suf)
-    elif bit.lower() == "sq":
-        bit = "Sq"
-        return ("strsuffix", bit, suf)
-    elif bit.lower() == "ter":
-        bit = "Ter"
-        return ("strsuffix", bit, suf)
-    elif bit.lower() == "dr":
-        bit = "Dr"
-        return ("strsuffix", bit, suf)
-    elif bit.lower() == "la":
-        bit = "Ln"
-        return ("strsuffix", bit, suf)
-    elif bit.lower() == "hway":
-        bit = "Hway"
-        return ("strsuffix", bit, suf)
-    elif bit.capitalize() in neighabbr:
-        return ("nh", neighabbr[bit.capitalize()], nei)
+    atom = atom.lower()
+    if atom == "r":
+        return ("ownership", "renter", OWNER)
+    elif atom == "h":
+        return ("ownership", "owner", OWNER)
+    elif atom == "b":
+        return ("ownership", "owner", OWNER)
+    elif atom == "wid":
+        return ("widowed", True, WIDOWED)
+    elif atom == "mrs":
+        return ("married", True, MRS)
+    elif atom.startswith("(") or atom.endswith(")"):
+        atom = atom.strip("()")
+        return ("spouse", atom.title(), SPOUSE)
+    elif atom.isalpha() and len(atom) == 1:
+        return ("first", atom.capitalize(), INITIAL)
+    elif atom == "II" or atom == "III":
+        return ("first", atom.capitalize(), INITIAL)
+    elif atom =="jr":
+        return ("first", atom.capitalize(), INITIAL)
+    elif atom.isdigit():
+        return ("number", bit, HOUSE_NUM)
+    elif atom in ('rd', 'ct', 'st', 'pk', 'av', 'ave', 'pl', 'pi', 'sq',
+                  'ter', 'dr', 'la', 'ln', 'hway'):
+        remap = {'av': 'Ave', 'la': 'Ln', 'pi': 'Pl'}
+        if atom in remap:
+            atom = remap[atom]
+        else:
+            atom = atom.capitalize()
+        return ("strsuffix", atom, STREET_SUFFIX)
+    elif atom in nhabbr:
+        return ("nh", nhabbr[atom], NH)
     else:
         return None
 
-def num_addresses(line):
-    #matches one or more standalone digits followed by one
-    #or more spaces followed by one to four words (street) followed
-    #by 0 or more spaces followed by 0 or 1 optional street suffix
-    #XXX don't match r or h by itself after the street name
-    #XXX don't match neighborhoods
-    #both of these bugs are being moderated in parse.py via python
-    #instead of trying to fix it in the regex.
-    pattern = r'\b(\d+)\s+((?:(?:\w+\s*)(?!\b(?:st|pk|rd|ct|av|la|dr|ter|pl|pi|hway)\b)){1,4})\s*(st|pk|rd|ct|av|la|dr|ter|pl|pi|hway)?'
-    return re.findall(pattern, line)
-
 def parse_addr(line):
-    pass
+    if not line.startswith('\x97'):
+        return None
+    words = map(str.lower, line.split())
+    pos = len(words) - 1
+    prefix = ''
+    repeat_street = False
+    result = {'strsuffix': 'St', 'nh': 'Boston',
+              'b_strsuffix': 'St', 'b_nh': 'Boston'}
+
+    # Note we will *skip* the first word entirely.
+    while pos>0:
+        word = words[pos]
+        word_prev = words[pos-1]
+
+        if word in nhabbr:
+            result[prefix+'nh'] = nhabbr[words[pos]]
+        if word in suffixes:
+            result[prefix+'strsuffix'] = word.capitalize()
+        elif word in ('h', 'r'):
+            result['owner'] = True if word=='h' else False
+        elif word == 'do':
+            repeat_street = True
+        elif word in streets or word in strabbr:
+            if word in strabbr:
+                street = strabbr[word].capitalize()
+            else:
+                street = word.capitalize()
+            if word_prev in ('n', 's', 'e', 'w'):
+                street = "%s %s" % (word_prev.capitalize(), street)
+                pos -= 1
+            result[prefix+'street'] = street
+        elif word.isdigit():
+            result[prefix+'number'] = word
+            prefix = 'b_'       
+        pos -= 1
+
+    if repeat_street:
+        result['street'] = result['b_street']
+    if 'b_street' in result and 'b_number' not in result:
+        del result['b_street']
+    if 'b_street' not in result:
+        del result['b_nh']
+        del result['b_strsuffix']
+    return result

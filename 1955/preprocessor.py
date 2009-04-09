@@ -4,7 +4,6 @@ preprocessor.py
 Cleans up 1955 data by attempting to rejoin split lines before
 actual parsing begins
 """
-#XXX some lines are repeated twice!
 import re
 import sys
 from helpers import * 
@@ -32,7 +31,7 @@ def process(fromfile):
             line = line.replace(",","")
             line = line.replace(".","")
             #converting subentries to a consistent start
-            if line.capitalize() in neighabbr:
+            if line.capitalize() in nhabbr:
                 prev_line += " " + line
                 processed.append(prev_line + '\n')
                 #fixing doubling up bug

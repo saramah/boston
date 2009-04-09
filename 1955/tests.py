@@ -1,6 +1,21 @@
 import helpers
 import unittest
 
+def dict_diff(have, want):
+    result = []
+    for key in sorted(want.keys()):
+        if not key in have:
+            result.append("{%s} want [%s] but MISSING" % (key, want[key]))
+        elif want[key] != have[key]:
+            result.append("{%s} want [%s] but have [%s]" % (key, want[key], have[key]))
+    for key in sorted(have.keys()):
+        if not key in want:
+            result.append("{%s} have [%s] but DO NOT WANT" % (key, have[key]))
+    if not result:
+        return None
+    else:
+        return '; '.join(result)
+
 class TestValidJump(unittest.TestCase):
     def testSanityTrue(self):
         """names should always move forward in alphabet"""
@@ -54,25 +69,29 @@ class TestRecognize(unittest.TestCase):
 
 class TestAddresses(unittest.TestCase):
     def testBase(self):
-        self.assertEqual(helpers.parse_addr("<97>Frank (Grace) carp h 70 Woodbole av Mat"), {'owner': True, 'number': 70, 'street':'Woodbole','strsuffix':'Ave', 'nh':'Mattapan'})
+        self.assertEqual(dict_diff(helpers.parse_addr("\x97Frank (Grace) carp h 70 Woodbole av Mat"), {'owner': True, 'number': '70', 'street':'Woodbole','strsuffix':'Av', 'nh':'Mattapan'}), None)
 
     def testNoNumber(self):
-        self.assertEqual(helpers.parse_addr("<97>Judith r S Bean ct Rox"), {'owner': False, 'street':'S Bean', 'strsuffix':'Ct', 'nh':'Roxbury'})
+        self.assertEqual(dict_diff(helpers.parse_addr("\x97Judith r S 8th ct Rox"), {'owner': False, 'street':'S 8th', 'strsuffix':'Ct', 'nh':'Roxbury'}), None)
 
     def testNoNHorSuffix(self):
-        self.assertEqual(helpers.parse_addr("<97>Lawrence lab r  56  Snowhill"), {'owner':False, 'number':56, 'street':'Snowhill', 'strsuffix':'St', 'nh':'Boston'})
+        self.assertEqual(dict_diff(helpers.parse_addr("\x97Lawrence lab r  56  Ziegler"), {'owner':False, 'number':'56', 'street':'Ziegler', 'strsuffix':'St', 'nh':'Boston'}), None)
 
     def testNuminStreetName(self):
-        self.assertEqual(helpers.parse_addr("<97>Rosanna F analysis dept First Natl Bank r 707 E 7th SB"), {'owner':False, 'number':707, 'street':'E 7th', 'strsuffix':'St','nh':'South Boston'})
+        self.assertEqual(dict_diff(helpers.parse_addr("\x97Rosanna F analysis dept First Natl Bank r 707 E 7th SB"), {'owner':False, 'number':'707', 'street':'E 7th', 'strsuffix':'St','nh':'South Boston'}), None)
 
     def testAddrwithRooms(self):
-        self.assertEqual(helpers.parse_addr("<97>A Paul lawyer 31 Milk rms 30S-313"), {'number':31, 'street':'Milk', 'strsuffix':'St', 'nh':'Boston'})
+        self.assertEqual(dict_diff(helpers.parse_addr("\x97A Paul lawyer 31 Milk rms 30S-313"), {'number':'31', 'street':'Milk', 'strsuffix':'St', 'nh':'Boston'}), None)
 
     def testBaseDoubleAddr(self):
-        self.assertEqual(helpers.parse_addr("<97>A Benj lawyer 11 Beacon  h 1726 Comlth av Br"), {'b_number':11, 'b_street':'Beacon', 'b_strsuffix':'St','b_nh':'Boston', 'owner':True, 'number':1726, 'street':'Commonwealth','strsuffix':'Ave', 'nh':'Brighton'})
+        self.assertEqual(dict_diff(helpers.parse_addr("\x97A Benj lawyer 11 Beacon  h 1726 Comlth av Br"), {'b_number':'11', 'b_street':'Beacon', 'b_strsuffix':'St','b_nh':'Boston', 'owner':True, 'number':'1726', 'street':'Commonwealth','strsuffix':'Av', 'nh':'Brighton'}), None)
 
     def testDitto(self):
-        self.assertEqual(helpers.parse_addr("<97>Wm (Marie A) dept store 352 Hanover h 350 do"), {'b_number':352, 'b_street':'Hanover', 'b_strsuffix':'St', 'b_nh':'Boston', 'owner':True, 'number':350, 'street':'Hanover', 'strsuffix':'St', 'nh':'Boston'})
+        self.assertEqual(dict_diff(helpers.parse_addr("\x97Wm (Marie A) dept store 352 Hanover h 350 do"), {'b_number':'352', 'b_street':'Hanover', 'b_strsuffix':'St', 'b_nh':'Boston', 'owner':True, 'number':'350', 'street':'Hanover', 'strsuffix':'St', 'nh':'Boston'}), None)
+
+    def testKeyError(self):
+        self.assertEqual(dict_diff(helpers.parse_addr("\x97Jos J (Antonetta) chauf h 1132 Saratoga EB"), {'owner':True, 'number':1132, 'street':'Saratoga', 'strsuffix':'St', 'nh':'East Boston'}), None)
+
 
 if __name__ == '__main__':
     unittest.main()

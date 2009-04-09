@@ -44,12 +44,11 @@ for line_no, line in enumerate(preprocessed):
         else:
             broken.append("%d %s BAD JUMP" % (line_no+1, line))
         continue
-    temp = num_addresses(line)
-    addresses = {}
-    for x in temp:
-        addresses[x[0]] = x
-    num_addr = len(addresses)
 
+    print "%d %s" % (line_no+1, line)
+    addresses = parse_addr(line)
+    print "%d %s" % (line_no+1, addresses)
+    continue
 #    print "%d %s" % (line_no+1, num_addr)
     entry = {}
     lineiter = line.split().__iter__()
@@ -61,6 +60,19 @@ for line_no, line in enumerate(preprocessed):
         if chomp.capitalize() in lnames:
             print "%d %s from\n%s" % (line_no+1, chomp, line)
             chomp = chomp.capitalize()
+            #if the line was misread by OCR or if the lastname is multiple
+            #words not connected by a hyphen, then grab the rest of it
+            #XXX this necessarily kills entries with lastnames that are 
+            #only the short chomps.
+            if chomp == "Co" or chomp == "De":
+                plname = ""
+                for atom in line.split()[1:]:
+                    chomp += atom.lower()
+                    if plname in lnames:
+                        break
+                if plname not in lnames:
+                    errors.append("%d %s UNRECOGNIZED LAST NAME" % (line_no+1, line))
+                    continue
             if valid_jump(last_name, chomp):
                 last_name = chomp
                 last_chomp = las
@@ -200,7 +212,7 @@ for line_no, line in enumerate(preprocessed):
     except StopIteration:
         pass
 
-    if "first" not in entry or "last" not in entry or "street" not in entry:
+    if "first" not in entry or "last" not in entry:
         errors.append("%d %s INCOMPLETE \n%d %s\n%s" % (line_no+1, line, line_no+1, entry, addresses))
         continue
     lines.append("%d %s" % (line_no+1, entry))
