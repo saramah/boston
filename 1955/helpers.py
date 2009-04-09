@@ -137,7 +137,7 @@ def recognize(atom):
     elif atom =="jr":
         return ("first", atom.capitalize(), INITIAL)
     elif atom.isdigit():
-        return ("number", bit, HOUSE_NUM)
+        return ("number", atom, HOUSE_NUM)
     elif atom in ('rd', 'ct', 'st', 'pk', 'av', 'ave', 'pl', 'pi', 'sq',
                   'ter', 'dr', 'la', 'ln', 'hway'):
         remap = {'av': 'Ave', 'la': 'Ln', 'pi': 'Pl'}
