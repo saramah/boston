@@ -75,6 +75,9 @@ class TestAddresses(unittest.TestCase):
         self.assertEqual(dict_diff(helpers.parse_addr("\x97Judith r S 8th ct Rox"), {'owner': False, 'street':'S 8th', 'strsuffix':'Ct', 'nh':'Roxbury'}), None)
         self.assertEqual(dict_diff(helpers.parse_addr("\x97Judith r 1F0 Seaver 2F0 S 8th ct Rox"), {'owner': False, 'b_nh': 'Boston', 'street':'S 8th', 'strsuffix':'Ct', 'nh':'Roxbury', 'b_street': 'Seaver', 'b_strsuffix':'St'}), None)
 
+    def testLongStreetName(self):
+        self.assertEqual(dict_diff(helpers.parse_addr("\x97Judith r S Blue Hill ct Rox"), {'owner': False, 'street':'S Blue Hill', 'strsuffix':'Ct', 'nh':'Roxbury'}), None)
+
     def testNoNHorSuffix(self):
         self.assertEqual(dict_diff(helpers.parse_addr("\x97Lawrence lab r  56  Ziegler"), {'owner':False, 'number':'56', 'street':'Ziegler', 'strsuffix':'St', 'nh':'Boston'}), None)
 
@@ -92,6 +95,7 @@ class TestAddresses(unittest.TestCase):
         self.assertEqual(dict_diff(helpers.parse_addr("\x97Wm (Marie A) dept store h 350 Hanover do"), {'b_number':'350', 'b_street':'Hanover', 'b_strsuffix':'St', 'b_nh':'Boston', 'owner':True, 'number':'350', 'street':'Hanover', 'strsuffix':'St', 'nh':'Boston'}), None)
         self.assertEqual(dict_diff(helpers.parse_addr("\x97Wm (Marie A) dept store h Hanover do"), {'b_street':'Hanover', 'b_strsuffix':'St', 'b_nh':'Boston', 'owner':True, 'street':'Hanover', 'strsuffix':'St', 'nh':'Boston'}), None)
         self.assertEqual(dict_diff(helpers.parse_addr("\x97Wm (Marie A) dept store 173 Blue Hill av Rox h 250 Seaver do"), {'b_number':'173', 'b_street':'Blue Hill', 'b_strsuffix':'Av', 'b_nh':'Roxbury', 'owner':True, 'number':'250', 'street':'Seaver', 'strsuffix':'St', 'nh':'Roxbury'}), None)
+
 
 if __name__ == '__main__':
     unittest.main()

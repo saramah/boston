@@ -166,56 +166,48 @@ def parse_addr(line):
     while pos>0:
         word = words[pos]
         word_prev = words[pos-1]
-
         #print 'w [%s] pos [%s] res [%s]' % (word, pos, result)
-
-        # Try to greedy-match a street name up to 5 words long (incl. this)
-        # Note we're still not looking at the first two words of the line.
-        start = 2 if (pos-4)<2 else pos-4
-        for i in range(start, pos):
-            cur_match = ' '.join(words[i:pos+1])
-            if cur_match in streets:
-                if prefix+'street' not in result:
-                    result[prefix+'street'] = cur_match.title()
-                    pos = i
-                    break
-                elif not prefix and 'b_street' not in result:
-                    result['b_street'] = cur_match.title()
-                    pos = i
-                    break
-        else:
-            if word in nhabbr:
-                # If we find a NH before a street address,
-                # it belongs to the business street.
-                if 'street' in result:
-                    prefix = 'b_'
-                result[prefix+'nh'] = nhabbr[words[pos]]
-            elif word in suffixes:
-                # If we find a suffix before a street address,
-                # it belongs to the business street.
-                if 'street' in result:
-                    prefix = 'b_'
-                result[prefix+'strsuffix'] = word.capitalize()
-            elif word in ('h', 'r'):
-                result['owner'] = True if word=='h' else False
-            elif word == 'do':
-                repeat_street = True
-            elif word.isdigit():
-                result[prefix+'number'] = word
+        if word in nhabbr:
+            # If we find a NH before a street address,
+            # it belongs to the business street.
+            if 'street' in result:
                 prefix = 'b_'
-            # One-word street or abbreviated, skip first 2 words
-            elif pos>1 and (word in streets or word in strabbr):
-                if word in strabbr:
-                    street = strabbr[word].capitalize()
-                else:
-                    street = word.capitalize()
-                if word_prev in ('n', 's', 'e', 'w'):
-                    street = "%s %s" % (word_prev.capitalize(), street)
-                    pos -= 1
-                if not prefix+'street' in result:
-                    result[prefix+'street'] = street
-                elif not prefix and 'b_street' not in result:
-                    result['b_street'] = street
+            result[prefix+'nh'] = nhabbr[words[pos]]
+        elif word in suffixes:
+            # If we find a suffix before a street address,
+            # it belongs to the business street.
+            if 'street' in result:
+                prefix = 'b_'
+            result[prefix+'strsuffix'] = word.capitalize()
+        elif word in ('h', 'r'):
+            result['owner'] = True if word=='h' else False
+        elif word == 'do':
+            repeat_street = True
+        elif word.isdigit():
+            result[prefix+'number'] = word
+            prefix = 'b_'
+        else:
+            # Try to greedy-match a street name up to 5 words long (incl. this)
+            # Note we're still not looking at the first two words of the line.
+            start = 2 if (pos-4)<2 else pos-4
+            for i in range(start, pos+1):
+                cur_match = ' '.join(words[i:pos+1])
+                if cur_match in streets or cur_match in strabbr:
+                    if not prefix and not 'street' in result:
+                        key = 'street'
+                    elif 'b_street' not in result:
+                        key = 'b_street'
+                    else:
+                        continue
+                    pos = i
+                    if cur_match in strabbr:
+                        cur_match = strabbr[cur_match]
+                    if words[i-1] in ('n', 's', 'e', 'w'):
+                        cur_match = "%s %s" % (words[i-1].capitalize(),
+                                               cur_match)
+                        pos -= 1
+                    result[key] = ' '.join(map(str.capitalize, cur_match.split()))
+                    break
         pos -= 1
 
     if repeat_street:
@@ -238,6 +230,6 @@ def parse_addr(line):
     return result
 
 if __name__ == '__main__':
-    line = "\x97Wm (Marie A) dept store h Hanover do"
+    line = "\x97Wm (Marie A) dept store 352 Hanover Rox h 350 do"
     print line
     print parse_addr(line)
