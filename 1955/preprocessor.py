@@ -40,19 +40,26 @@ def process(fromfile):
                 line = "\x97%s" %(line[2:])
             elif line.startswith(("_", "-")):
                 line = "\x97%s" %(line[1:])
-            if line.capitalize() in nhabbr:
+            if line.lower() in nhabbr:
                 prev_line += " " + line
                 processed.append(prev_line + '\n')
                 #we already condensed the lines right here, so we don't
                 #need to recondense them again
                 condense = False
                 continue
+            if line.split()[-1].isdigit():
+                prev_line = line
+                condense = True
+                continue
             #condensing entries to one line
             if condense:
+#                print "here"
                 start = line.split()[0]
-                end = line.split()[-1]
+                end = prev_line.split()[-1]
                 definite = prev_line.endswith("-") or end.isdigit()
-                no_condense = line.startswith("\x97") or start.isupper() or start.lower() in lnames
+                no_condense = line.startswith("\x97") or start.isupper() or (start.lower() in lnames)
+#                print "definite: %s nocondense: %d" % (definite, no_condense)
+#                print "neigh?: %s street?: %s" % (start in ntuple, start in stuple)
                 if not (start in ntuple) and not (start in stuple) and not definite and no_condense:
                     #false alarm, new entry or lname header
                     processed.append(prev_line + '\n')

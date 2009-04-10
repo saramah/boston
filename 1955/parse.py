@@ -161,7 +161,7 @@ for line_no, line in enumerate(preprocessed):
                 else: continue
             #we've hit the address section, finish up with everything in
             #parse_addr
-            elif tup[2] == HOUSE_NUM:
+            elif tup[2] == HOUSE_NUM or chomp.lower() in streets:
                 break
             else:
                 entry[tup[0]] = tup[1]

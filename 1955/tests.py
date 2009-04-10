@@ -1,5 +1,6 @@
 import helpers
 import unittest
+import preprocessor
 
 def dict_diff(have, want):
     result = []
@@ -101,6 +102,13 @@ class TestAddresses(unittest.TestCase):
 
     def testWithCompany(self):
         self.assertEqual(dict_diff(helpers.parse_addr("\x97Sidney (Tots N Teens) children's clo r 25 Lucille"), {'owner':False, 'number':'25', 'street':'Lucille', 'strsuffix':'St', 'nh':'Boston'}), None)
+
+class TestPreprocessor(unittest.TestCase):
+    def testNumber(self):
+        self.assertEqual(preprocessor.process("test/test1.txt"), ["\xc2\x97Joanne M stat niach opr City Auditing Dept r 32 Gaston Rox"])
+
+    def testHyphen(self):
+        pass
 
     
 if __name__ == '__main__':

@@ -51,7 +51,7 @@ def build_dictionary(path, kv):
 #neighborhood abbreviations, name abbreviations
 lnames = build_dictionary("../dict/lastnames.txt", False)
 fnames = build_dictionary("../dict/firstnames.txt", False)
-streets = build_dictionary("../dict/streetnames.txt", False)
+streets = build_dictionary("../dict/1955streets.txt", False)
 nhoods = build_dictionary("../dict/neighborhoods.txt", False)
 nameabbr = build_dictionary("../dict/firstabbr.txt", True)
 strabbr = build_dictionary("../dict/strabbr.txt", True)
@@ -72,7 +72,8 @@ def condense_lines(line, linelist):
             space = ""
         line = "%s%s%s" % (line, space, line2)
         condense_lines(line, linelist)
-    except IndexError: pass
+    except IndexError: 
+        pass
     return line
 
 def find_errors(line):
@@ -119,9 +120,7 @@ def recognize(atom):
     atom = atom.lower()
     if atom == "r":
         return ("ownership", "renter", OWNER)
-    elif atom == "h":
-        return ("ownership", "owner", OWNER)
-    elif atom == "b":
+    elif atom == "h" or atom == "b" or atom == "n":
         return ("ownership", "owner", OWNER)
     elif atom == "wid":
         return ("widowed", True, WIDOWED)
@@ -141,7 +140,7 @@ def recognize(atom):
     elif atom in ('rd', 'ct', 'st', 'pk', 'av', 'ave', 'pl', 'pi', 'sq',
                   'ter', 'dr', 'la', 'ln', 'hway'):
         remap = {'av': 'Ave', 'la': 'Ln', 'pi': 'Pl'}
-        if atom in remap:
+        if atom.lower() in remap:
             atom = remap[atom]
         else:
             atom = atom.capitalize()
