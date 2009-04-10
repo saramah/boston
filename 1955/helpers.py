@@ -212,6 +212,10 @@ def parse_addr(line):
         # blah blah blah 350 Hanover do
         # Copy street, (number), nh to b_
         if not 'b_street' in result:
+            #if we encounter a ditto when we don't have any address
+            #we can't do anything, so just return None
+            if not 'street' in result:
+                return None
             result['b_street'] = result['street']
             result['b_nh'] = result['nh']
             if 'number' in result:

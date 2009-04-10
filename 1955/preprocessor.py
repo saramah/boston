@@ -49,8 +49,11 @@ def process(fromfile):
                 continue
             #condensing entries to one line
             if condense:
-                start = line.split()[0].lower()
-                if not prev_line.endswith("-") and not (start in ntuple) and not (start in stuple) and (line.startswith("\x97") or start.isupper() or start in lnames):
+                start = line.split()[0]
+                end = line.split()[-1]
+                definite = prev_line.endswith("-") or end.isdigit()
+                no_condense = line.startswith("\x97") or start.isupper() or start.lower() in lnames
+                if not (start in ntuple) and not (start in stuple) and not definite and no_condense:
                     #false alarm, new entry or lname header
                     processed.append(prev_line + '\n')
                 else:

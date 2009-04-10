@@ -48,6 +48,9 @@ for line_no, line in enumerate(preprocessed):
         continue
 
     addresses = parse_addr(line)
+    if addresses is None:
+        errors.append("%d %s NO ADDRESS" % (line_no+1, line))
+        continue
 
     entry = {}
     lineiter = line.split().__iter__()
@@ -110,10 +113,15 @@ for line_no, line in enumerate(preprocessed):
     
         entry["nh"] = "Boston"
         entry["strsuffix"] = "St"
+
+        entry.update(addresses)
+
         #handling everything else.
         while True:
             tup = recognize(chomp)
             if tup is None:
+                if chomp.lower() in streets:
+                    break             
                 if "prof" in entry:
                     entry["prof"] += " " + chomp
                 else:
@@ -154,11 +162,6 @@ for line_no, line in enumerate(preprocessed):
             #we've hit the address section, finish up with everything in
             #parse_addr
             elif tup[2] == HOUSE_NUM:
-                if addresses is None:
-                    errors.append("%d %s NO ADDRESS" % (line_no+1, line))
-                    break
-                for key in addresses:
-                    entry[key] = addresses[key]
                 break
             else:
                 entry[tup[0]] = tup[1]

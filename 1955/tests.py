@@ -99,5 +99,9 @@ class TestAddresses(unittest.TestCase):
     def testInitialEntry(self):
         self.assertEqual(dict_diff(helpers.parse_addr("Coglin Edw J emp United Farmers r 16 White cir st Wakefield"), {'owner':False, 'number':'16', 'street':'White Cir', 'strsuffix':'St', 'nh':'Wakefield'}), None)
 
+    def testWithCompany(self):
+        self.assertEqual(dict_diff(helpers.parse_addr("\x97Sidney (Tots N Teens) children's clo r 25 Lucille"), {'owner':False, 'number':'25', 'street':'Lucille', 'strsuffix':'St', 'nh':'Boston'}), None)
+
+    
 if __name__ == '__main__':
     unittest.main()
