@@ -152,8 +152,6 @@ def recognize(atom):
         return None
 
 def parse_addr(line):
-    if not line.startswith('\x97'):
-        return None
     words = map(str.lower, line.split())
     pos = len(words) - 1
     prefix = ''

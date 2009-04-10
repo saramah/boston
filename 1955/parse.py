@@ -45,9 +45,9 @@ for line_no, line in enumerate(preprocessed):
             broken.append("%d %s BAD JUMP" % (line_no+1, line))
         continue
 
-    print "%d %s" % (line_no+1, line)
+#    print "%d %s" % (line_no+1, line)
     addresses = parse_addr(line)
-    print "%d %s" % (line_no+1, addresses)
+#    print "%d %s" % (line_no+1, addresses)
 
     entry = {}
     lineiter = line.split().__iter__()
@@ -126,9 +126,9 @@ for line_no, line in enumerate(preprocessed):
                 while not chomp.endswith(")"):
                     chomp += " " + lineiter.next()
                 chomp = tup[1].capitalize()
-                if chomp in nameabbr:
-                    chomp = nameabbr[chomp]
-                elif chomp in fnames:
+                if chomp.lower() in nameabbr:
+                    chomp = nameabbr[chomp.lower()].capitalize()
+                elif chomp.lower() in fnames:
                     if "spouse" in entry:
                         entry["spouse"] += " " + chomp
                     else:
@@ -145,11 +145,11 @@ for line_no, line in enumerate(preprocessed):
             #XXX still not working quite right
             elif tup[2] == WIDOWED:
                 entry[tup[0]] = tup[1]
-                chomp = lineiter.next().capitalize()
-                if chomp in nameabbr:
-                    chomp = nameabbr[chomp]
-                if chomp in fnames:
-                    entry["spouse"] = chomp
+                chomp = lineiter.next()
+                if chomp.lower() in nameabbr:
+                    chomp = nameabbr[chomp.lower()]
+                if chomp.lower() in fnames:
+                    entry["spouse"] = chomp.capitalize()
                 else: continue
             #we've hit the address section, finish up with everything in
             #parse_addr
@@ -157,7 +157,6 @@ for line_no, line in enumerate(preprocessed):
                 if addresses is None:
                     errors.append("%d %s NO ADDRESS" % (line_no+1, line))
                     break
-                print addresses
                 for key in addresses:
                     entry[key] = addresses[key]
                 break
@@ -168,7 +167,7 @@ for line_no, line in enumerate(preprocessed):
     except StopIteration:
         pass
 
-    if "first" not in entry or "last" not in entry:
+    if "first" not in entry or "last" not in entry or "street" not in entry:
         errors.append("%d %s INCOMPLETE \n%d %s\n%s" % (line_no+1, line, line_no+1, entry, addresses))
         continue
     lines.append("%d %s" % (line_no+1, entry))
