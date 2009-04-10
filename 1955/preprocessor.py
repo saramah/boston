@@ -31,6 +31,10 @@ def process(fromfile):
             line = line.strip()
             line = line.replace(",","")
             line = line.replace(".","")
+            #hackish; do doesn't get caught by the preprocessor as being
+            #something that should be condensed
+            if line == "do":
+                continue
             #converting subentries to a consistent start
             if line.startswith("--"):
                 line = "\x97%s" %(line[2:])

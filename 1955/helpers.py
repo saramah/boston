@@ -132,7 +132,7 @@ def recognize(atom):
         return ("spouse", atom.title(), SPOUSE)
     elif atom.isalpha() and len(atom) == 1:
         return ("first", atom.capitalize(), INITIAL)
-    elif atom == "II" or atom == "III":
+    elif atom == "ii" or atom == "iii":
         return ("first", atom.capitalize(), INITIAL)
     elif atom =="jr":
         return ("first", atom.capitalize(), INITIAL)

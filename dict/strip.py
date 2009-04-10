@@ -1,12 +1,16 @@
-infile = open("Resident_List_2008_Aug.txt")
-lnames = {}
+import re
+
+infile = open("1955streets.txt")
+outfile = open("1955streetsout.txt", 'w')
 for line in infile:
-    lname = line.split()[0].capitalize()
-    if lname not in lnames:
-        lnames[lname] = True
+    line = line.strip()
+    if line.isspace():
+        continue
+    if line.isdigit():
+        continue
+    if re.search(r'\d+-\d+', line):
+        continue
+    print line
+    outfile.write(line + '\n')
 infile.close()
-outfile = open("2008lnames.txt", 'w')
-lnames = lnames.keys()
-for atom in lnames:
-    outfile.write(atom + '\n')
 outfile.close()

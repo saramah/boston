@@ -47,9 +47,7 @@ for line_no, line in enumerate(preprocessed):
             broken.append("%d %s BAD JUMP" % (line_no+1, line))
         continue
 
-#    print "%d %s" % (line_no+1, line)
     addresses = parse_addr(line)
-#    print "%d %s" % (line_no+1, addresses)
 
     entry = {}
     lineiter = line.split().__iter__()
