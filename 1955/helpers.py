@@ -49,9 +49,9 @@ def build_dictionary(path, kv):
 #####build dictionaries
 #last names, male/female first names, streets, neighborhoods
 #neighborhood abbreviations, name abbreviations
-lnames = build_dictionary("../dict/lastnames.txt", False)
+lnames = build_dictionary("../dict/alllnames.txt", False)
 fnames = build_dictionary("../dict/firstnames.txt", False)
-streets = build_dictionary("../dict/1955streets.txt", False)
+streets = build_dictionary("../dict/allstreets.txt", False)
 nhoods = build_dictionary("../dict/neighborhoods.txt", False)
 nameabbr = build_dictionary("../dict/firstabbr.txt", True)
 strabbr = build_dictionary("../dict/strabbr.txt", True)
@@ -104,6 +104,8 @@ def valid_jump(first, second):
     if dist_firstletter < 0 or dist_firstletter > 1:
         return False
     else:
+        if len(second) < 2 or len(first) < 2:
+            return True
         dist_secondletter = ord(second[1].lower()) - ord(first[1].lower())
         if dist_secondletter < 0:
             return False
@@ -140,7 +142,7 @@ def recognize(atom):
     elif atom in ('rd', 'ct', 'st', 'pk', 'av', 'ave', 'pl', 'pi', 'sq',
                   'ter', 'dr', 'la', 'ln', 'hway'):
         remap = {'av': 'Ave', 'la': 'Ln', 'pi': 'Pl'}
-        if atom.lower() in remap:
+        if atom in remap:
             atom = remap[atom]
         else:
             atom = atom.capitalize()
@@ -176,8 +178,8 @@ def parse_addr(line):
             if 'street' in result:
                 prefix = 'b_'
             result[prefix+'strsuffix'] = word.capitalize()
-        elif word in ('h', 'r'):
-            result['owner'] = True if word=='h' else False
+        elif word in ('h', 'r', 'b', 'n'):
+            result['owner'] = False if word=='r' else True 
         elif word == 'do':
             repeat_street = True
         elif word.isdigit():

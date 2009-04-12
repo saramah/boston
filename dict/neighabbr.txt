@@ -10,7 +10,6 @@ Camb Cambridge
 Wol Wollaston
 Eb East Boston
 Ch Chestnut Hill
-Wash Washington
 Chel Chelsea
 Jp Jamaica Plain
 Arl Arlington
@@ -55,3 +54,5 @@ EB East Boston
 JP Jamaica Plain
 CH Chestnut Hill
 WR West Roxbury
+Winthrop Winthrop
+Beverly Beverly
