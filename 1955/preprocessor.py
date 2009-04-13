@@ -66,8 +66,6 @@ def process(fromfile):
                     #false alarm, new entry or lname header
                     processed.append(prev_line + '\n')
                 else:
-                    if prev_line.startswith("Abel"):
-                        print "%d %s start: %s end: %s def:%s nc:%s" % (count, line, start, end, definite, no_condense)
                     line = condense_lines(prev_line, [line])
                     processed.append(line + '\n')
                 condense = False
