@@ -46,24 +46,24 @@ def parse(directory):
             #XXX wishlist: hook in a levenshtein distance calculator to fix
             #words with invalid characters.
             if find_errors(line):
-                broken.append("%d %s INVALID CHARS" % (line_no+1, line))
+                broken.append({'filepath':infile, 'line_no':line_no, 'line':line.strip()})
                 continue
             #stripping out death lines, these don't contain addresses
             if re.search(r'\bdied\b', line):
-                died.append("%d %s lastname: %s" % (line_no+1, line, last_name))
+                died.append({'filepath':infile, 'line_no':line_no, 'line':line.strip()})
                 continue
             #some lastname headers have form "Cohig see Cohen, Cofen" etc
             #this just takes the first part of that line.
             if re.search(r'\bsee\b', line):
-                line = line.split()
+                split_line = line.split()
                 potential_lname = ""
-                for bit in line:
+                for bit in split_line:
                     if bit == "see":
                         break
                     potential_lname += bit.lower()
                 potential_lname = potential_lname.capitalize()
                 if potential_lname.lower() not in lnames:
-                    errors.append("%d %s UNRECOGNIZED LAST NAME" % (line_no+1, line))
+                    broken.append({'filepath':infile, 'line_no':line_no, 'line':line.strip(), 'reason':'bad jump'})
                     continue
                 if valid_jump(last_name, potential_lname):
                     dist = distance(lname_index, potential_lname.lower())
@@ -71,12 +71,14 @@ def parse(directory):
                         last_name = potential_lname
                         lname_index += dist
                     else:
-                        broken.append("%d %s BAD JUMP" % (line_no+1, line))
+                        broken.append({'filepath':infile, 'line_no':line_no, 'line':line.strip(), 'reason':'bad jump'})
                 else:
-                    broken.append("%d %s BAD JUMP" % (line_no+1, line))
+                    broken.append({'filepath':infile, 'line_no':line_no, 'line':line.strip(), 'reason':'bad jump'})
                 continue
 
             entry = {}
+            entry['filepath'] = infile
+            entry['line_no'] = line_no
             lineiter = line.split().__iter__()
             last_chomp = -1
             try:
@@ -114,9 +116,9 @@ def parse(directory):
                                 last_name = chomp
                                 lname_index += dist
                         else:
-                            broken.append("%d %s BAD JUMP" % (line_no+1, line))
+                            broken.append({'filepath':infile, 'line_no':line_no, 'line':line.strip(), 'reason':'bad jump'})
                     else:
-                        broken.append("%d %s BAD JUMP" % (line_no+1, line))
+                        broken.append({'filepath':infile, 'line_no':line_no, 'line':line.strip(), 'reason':'bad jump'})
                         continue
                     
                     chomp = lineiter.next()
@@ -128,13 +130,13 @@ def parse(directory):
                     elif first in fnames:
                         entry["first"] = first.capitalize()
                     else:
-                        errors.append("%d %s UNRECOGNIZED NAME" % (line_no+1, line))
+                        broken.append({'filepath':infile, 'line_no':line_no, 'line':line.strip(), 'reason':'unrecognized first name'})
                         continue
                     entry["last"] = last_name
                 #if it's not a lastname or a subentry, then it's a line
                 #we should have handled in our preprocessor; mark it.
                 else:
-                    errors.append("%d %s BAD PREFIX" % (line_no+1, line))
+                    broken.append({'filepath':infile, 'line_no':line_no, 'line':line.strip(), 'reason':'bad prefix'})
                     continue
 
                 chomp = lineiter.next()
@@ -171,7 +173,6 @@ def parse(directory):
                             business = chomp.strip("()")
                             entry["business"] = business
                     #widowed entry; deceased's name optionally follows
-                    #XXX still not working quite right
                     elif tup[2] == WIDOWED:
                         entry[tup[0]] = tup[1]
                         chomp = lineiter.next()
@@ -201,8 +202,9 @@ def parse(directory):
                 pass
 
             if "first" not in entry or "last" not in entry or "street" not in entry:
-                errors.append("%d %s INCOMPLETE \n%d %s" % (line_no+1, line, line_no+1, entry))
+                entry['reason'] = 'incomplete'
+                errors.append(entry)
                 continue
-            lines.append("%d %s" % (line_no+1, entry))
+            lines.append(entry)
 
     return (lines, errors, broken, died)
