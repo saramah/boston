@@ -12,13 +12,16 @@ from helpers import *
 ntuple = tuple(build_dictionary("../dict/neighabbr.txt", True).keys())
 stuple = tuple(build_dictionary("../dict/streetnames.txt", False))
 
+
 def process(fromfile):
     processed = []
     with open(fromfile) as infile:
         prev_line = ""
         condense = False
         lastname = ""
+        count = 0
         for line in infile:
+            count += 1
             #ignore died lines and empty lines
             if re.search(r'\bdied\b', line):
                 continue
@@ -53,7 +56,6 @@ def process(fromfile):
                 continue
             #condensing entries to one line
             if condense:
-#                print "here"
                 start = line.split()[0]
                 end = prev_line.split()[-1]
                 definite = prev_line.endswith("-") or end.isdigit()
@@ -64,8 +66,12 @@ def process(fromfile):
                     #false alarm, new entry or lname header
                     processed.append(prev_line + '\n')
                 else:
+                    if prev_line.startswith("Abel"):
+                        print "%d %s start: %s end: %s def:%s nc:%s" % (count, line, start, end, definite, no_condense)
                     line = condense_lines(prev_line, [line])
+                    processed.append(line + '\n')
                 condense = False
+                continue
             if len(line.split()) < 3:
                 prev_line = line
                 condense = True

@@ -1,22 +1,32 @@
 from __future__ import with_statement
 
+import os
 import re
 import sys
-import fileinput
 import preprocessor
 
 from helpers import *
 
+#lines - parsed without errors
+#errors - partially parsed with fixable errors
+#broken - unparsed with known dirty data
+#died - unparsed, names of deceased with dates
 lines, errors, broken, died = [], [], [], []
-last_name = ""
+last_name = lname_marker[0] 
+#lname_index - keeps track of the index of the lastname
+#we're currently on so we don't have to recalculate it
+#every time
+lname_index = 0
 
+filepaths = os.listdir(sys.argv[1])
+filepaths = sorted(map((lambda x: sys.argv[1]+ "/" + x), filepaths))
 
-for infile in sys.argv[1:]:
+for infile in filepaths:
+    lines.append('\n' + infile + '\n')
     #preprocess the file before we start parsing it
     preprocessed = preprocessor.process(infile)
 
     with open("out", 'a') as outfile:
-        print file.name
         for x in preprocessed:
             outfile.write(x)
 
@@ -44,11 +54,16 @@ for infile in sys.argv[1:]:
                     break
                 potential_lname += bit.lower()
             potential_lname = potential_lname.capitalize()
+            if potential_lname.lower() not in lnames:
+                errors.append("%d %s UNRECOGNIZED LAST NAME" % (line_no+1, line))
+                continue
             if valid_jump(last_name, potential_lname):
-                if potential_lname not in lnames:
-                    errors.append("%d %s UNRECOGNIZED LAST NAME" % (line_no+1, line))
-                    continue
-                last_name = potential_lname
+                dist = distance(lname_index, potential_lname.lower())
+                if dist != -1:
+                    last_name = potential_lname
+                    lname_index += dist
+                else:
+                    broken.append("%d %s BAD JUMP" % (line_no+1, line))
             else:
                 broken.append("%d %s BAD JUMP" % (line_no+1, line))
             continue
@@ -59,31 +74,39 @@ for infile in sys.argv[1:]:
         try:
             chomp = lineiter.next()
             count += 1
+            #we've got a subentry, so we should have the
+            #last name from the last line
+            if chomp.startswith("\x97"):
+                first = chomp[1:].lower()
+                if first in nameabbr:
+                    first = nameabbr[first]
+                entry["first"] = first.capitalize()
+                entry["last"] = last_name
             #if line starts with a last name, then grab the
             #first name after it as well
-            if chomp.lower() in lnames:
+            elif chomp.lower() in lnames:
 #            print "%d %s from\n%s" % (line_no+1, chomp, line)
                 chomp = chomp.capitalize()
                 #if the line was misread by OCR or if the lastname is multiple
                 #words not connected by a hyphen, then grab the rest of it
-                #XXX this necessarily kills entries with lastnames that are 
-                #only the short chomps.
-                if chomp == "Co" or chomp == "De" or chomp == "O":
-                    plname = ""
+                if chomp == "Co" or chomp == "De" or chomp == "Di" or chomp == "O":
+                    plname = chomp 
                     for atom in line.split()[1:]:
-                        chomp += atom.lower()
+                        plname += atom.lower()
                         if plname in lnames:
+                            chomp = plname
                             break
                 if valid_jump(last_name, chomp):
-                    if chomp.lower() not in lnames:
-                        errors.append("%d %s UNRECOGNIZED LAST NAME" % (line_no+1, line))
-                        continue
-                    #XXX neighborhood/lastname clashes
-                    if chomp.lower() in nhabbr:
-                        pass
+                    dist = distance(lname_index, chomp.lower())
+                    if dist != -1:
+                        #XXX neighborhood/lastname clashes
+                        if chomp.lower() in nhabbr:
+                            pass
+                        else:
+                            last_name = chomp
+                            lname_index += dist
                     else:
-                        last_name = chomp
-                        last_chomp = LAST_NAME 
+                        broken.append("%d %s BAD JUMP" % (line_no+1, line))
                 else:
                     broken.append("%d %s BAD JUMP" % (line_no+1, line))
                     continue
@@ -100,19 +123,9 @@ for infile in sys.argv[1:]:
                     errors.append("%d %s UNRECOGNIZED NAME" % (line_no+1, line))
                     continue
                 entry["last"] = last_name
-                last_chomp = LAST_NAME
-            #otherwise we've got a subentry, so we should have the
-            #last name from the last line
-            elif chomp.startswith("\x97"):
-                first = chomp[1:].lower()
-                if first in nameabbr:
-                    first = nameabbr[first]
-                entry["first"] = first.capitalize()
-                entry["last"] = last_name
-                last_chomp = FIRST_NAME
             #if it's not a lastname or a subentry, then it's a line
             #we should have handled in our preprocessor; mark it.
-            if last_chomp == -1:
+            else:
                 errors.append("%d %s BAD PREFIX" % (line_no+1, line))
                 continue
 

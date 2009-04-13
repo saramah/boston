@@ -56,3 +56,6 @@ CH Chestnut Hill
 WR West Roxbury
 Winthrop Winthrop
 Beverly Beverly
+Swmsct Swampscott
+Hingham Hingham
+Cohasset Cohasset
