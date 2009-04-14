@@ -1,6 +1,6 @@
 from __future__ import with_statement
 
-import os
+import os, os.path
 import re
 import sys
 import preprocessor
@@ -20,14 +20,20 @@ def parse(directory):
     #broken - unparsed with known dirty data
     #died - unparsed, names of deceased with dates
     lines, errors, broken, died = [], [], [], []
-    last_name = lname_marker[0] 
+    last_name = lname_marker[6349] 
     #lname_index - keeps track of the index of the lastname
     #we're currently on so we don't have to recalculate it
     #every time
-    lname_index = 0
+    lname_index = 6349
+    filepaths = []
 
-    filepaths = os.listdir(directory)
-    filepaths = sorted(map((lambda x: directory+ "/" + x), filepaths))
+    if os.path.isdir(directory):
+        filepaths = os.listdir(directory)
+        filepaths = sorted(map((lambda x: directory+ "/" + x), filepaths))
+    elif os.path.isfile(directory):
+        filepaths.append(directory)
+    else:
+        raise NotImplementedError
 
     for infile in filepaths:
         #preprocess the file before we start parsing it
@@ -87,6 +93,8 @@ def parse(directory):
                 #last name from the last line
                 if chomp.startswith("\x97"):
                     first = chomp[1:].lower()
+                    if first.startswith("\x97"):
+                        first = first[1:]
                     if first in nameabbr:
                         first = nameabbr[first]
                     entry["first"] = first.capitalize()

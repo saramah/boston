@@ -68,7 +68,7 @@ died_table = Table('died', meta,
         Column('line', String),
         )
 
-engine = sa.create_engine("sqlite:///addr_data")
+engine = sa.create_engine("sqlite:///addr_data.db")
 meta.bind = engine
 meta.create_all()
 mapper(Entry, addresses_table)

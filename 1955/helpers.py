@@ -119,8 +119,10 @@ def valid_jump(first, second):
     if first == "":
         return True
     dist_firstletter = ord(second[0].lower()) - ord(first[0].lower())
-    if dist_firstletter < 0 or dist_firstletter > 1:
+    if dist_firstletter < 0:
         return False
+    elif dist_firstletter == 1:
+        return True
     else:
         if len(second) < 2 or len(first) < 2:
             return True
@@ -135,7 +137,7 @@ lname_marker = build_list("../dict/alllnames.txt")
 #loose initial analysis, it seems the jumps between lastnames
 #in the directory range from 1 to 40; setting a low tolerance
 #should result in relatively accurate last name progression
-WINDOW = 100
+WINDOW = 300
 
 def distance(index, lastname):
     """
@@ -153,7 +155,10 @@ def distance(index, lastname):
         if diff > WINDOW:
             return -1
         point = lname_marker[point_index]
-        point_index += 1
+        try:
+            point_index += 1
+        except IndexError:
+            return -1
         diff = point_index - index
     return diff
 

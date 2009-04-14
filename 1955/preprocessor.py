@@ -28,12 +28,12 @@ def process(fromfile):
             #purging room numbers
             for room in re.findall(r'(?:\brms\s\d+(?:\s|-)\d+)|(?:\brm\s+\d+)', line):
                 line = line.replace(room, "")
-            if line.isspace():
-                continue
             #stripping leading/trailing whitespace, commas, and periods
             line = line.strip()
             line = line.replace(",","")
             line = line.replace(".","")
+            if line.isspace() or line == "":
+                continue
             #hackish; do doesn't get caught by the preprocessor as being
             #something that should be condensed
             if line == "do":
