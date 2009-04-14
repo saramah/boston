@@ -93,8 +93,7 @@ def parse(directory):
                 #last name from the last line
                 if chomp.startswith("\x97"):
                     first = chomp[1:].lower()
-                    if first.startswith("\x97"):
-                        first = first[1:]
+                    first = first.replace("\x97", "")
                     if first in nameabbr:
                         first = nameabbr[first]
                     entry["first"] = first.capitalize()

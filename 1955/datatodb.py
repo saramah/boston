@@ -4,68 +4,68 @@
 import parser
 import sqlalchemy as sa
 from entry import Entry, ErroredEntry, BrokenLine, DiedLine
-from sqlalchemy import Table, Column, Integer, Boolean, String, MetaData
+from sqlalchemy import Table, Column, Integer, Boolean, Unicode, MetaData
 from sqlalchemy.orm import mapper, sessionmaker
 
 meta = MetaData()
 
 addresses_table = Table('addresses', meta,
         Column('id', Integer, primary_key=True),
-        Column('filepath', String),
+        Column('filepath', Unicode),
         Column('line_no', Integer),
-        Column('last', String),
-        Column('first', String),
+        Column('last', Unicode),
+        Column('first', Unicode),
         Column('widowed', Boolean),
-        Column('spouse', String),
+        Column('spouse', Unicode),
         Column('married', Boolean),
-        Column('prof', String),
-        Column('business', String),
+        Column('prof', Unicode),
+        Column('business', Unicode),
         Column('ownership', Boolean),
-        Column('b_number', String(8)),
-        Column('b_street', String),
-        Column('b_strsuffix', String(5)),
-        Column('b_nh', String),
-        Column('number', String(8)),
-        Column('street', String),
-        Column('strsuffix', String(5)),
-        Column('nh', String)
+        Column('b_number', Unicode(8)),
+        Column('b_street', Unicode),
+        Column('b_strsuffix', Unicode(5)),
+        Column('b_nh', Unicode),
+        Column('number', Unicode(8)),
+        Column('street', Unicode),
+        Column('strsuffix', Unicode(5)),
+        Column('nh', Unicode)
         )
 
 errors_table = Table('errors', meta,
         Column('id', Integer, primary_key=True),
-        Column('filepath', String),
+        Column('filepath', Unicode),
         Column('line_no', Integer),
-        Column('last', String),
-        Column('first', String),
+        Column('last', Unicode),
+        Column('first', Unicode),
         Column('widowed', Boolean),
-        Column('spouse', String),
+        Column('spouse', Unicode),
         Column('married', Boolean),
-        Column('prof', String),
-        Column('business', String),
+        Column('prof', Unicode),
+        Column('business', Unicode),
         Column('ownership', Boolean),
-        Column('b_number', String(8)),
-        Column('b_street', String),
-        Column('b_strsuffix', String(5)),
-        Column('b_nh', String),
-        Column('number', String(8)),
-        Column('street', String),
-        Column('strsuffix', String(5)),
-        Column('nh', String),
-        Column('reason', String)
+        Column('b_number', Unicode(8)),
+        Column('b_street', Unicode),
+        Column('b_strsuffix', Unicode(5)),
+        Column('b_nh', Unicode),
+        Column('number', Unicode(8)),
+        Column('street', Unicode),
+        Column('strsuffix', Unicode(5)),
+        Column('nh', Unicode),
+        Column('reason', Unicode)
         )
 
 broken_table = Table('broken', meta,
         Column('id', Integer, primary_key=True),
-        Column('filepath', String),
+        Column('filepath', Unicode),
         Column('line_no', Integer),
-        Column('line', String),
-        Column('reason', String)
+        Column('line', Unicode),
+        Column('reason', Unicode)
         )
 died_table = Table('died', meta,
         Column('id', Integer, primary_key=True),
-        Column('filepath', String),
+        Column('filepath', Unicode),
         Column('line_no', Integer),
-        Column('line', String),
+        Column('line', Unicode),
         )
 
 engine = sa.create_engine("sqlite:///addr_data.db")
@@ -83,28 +83,28 @@ lines, errors, broken, died = parser.parse("select")
 for atom in lines:
     entry = Entry()
     for attr in atom:
-        setattr(entry, attr, atom[attr])
+        setattr(entry, attr, unicode(atom[attr]))
     session.add(entry)
 session.commit()
 
 for atom in errors:
     entry = ErroredEntry()
     for attr in atom:
-        setattr(entry, attr, atom[attr])
+        setattr(entry, attr, unicode(atom[attr]))
     session.add(entry)
 session.commit()
 
 for atom in broken:
     entry = BrokenLine()
     for attr in atom:
-        setattr(entry, attr, atom[attr])
+        setattr(entry, attr, unicode(atom[attr]))
     session.add(entry)
 session.commit()
 
 for atom in broken:
     entry = DiedLine()
     for attr in atom:
-        setattr(entry, attr, atom[attr])
+        setattr(entry, attr, unicode(atom[attr]))
     session.add(entry)
 session.commit()
 
