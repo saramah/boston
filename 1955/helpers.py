@@ -154,11 +154,11 @@ def distance(index, lastname):
     while point != lastname:
         if diff > WINDOW:
             return -1
-        point = lname_marker[point_index]
         try:
-            point_index += 1
+            point = lname_marker[point_index]
         except IndexError:
             return -1
+        point_index += 1
         diff = point_index - index
     return diff
 

@@ -20,11 +20,11 @@ def parse(directory):
     #broken - unparsed with known dirty data
     #died - unparsed, names of deceased with dates
     lines, errors, broken, died = [], [], [], []
-    last_name = lname_marker[6349] 
+    last_name = lname_marker[0] 
     #lname_index - keeps track of the index of the lastname
     #we're currently on so we don't have to recalculate it
     #every time
-    lname_index = 6349
+    lname_index = 0
     filepaths = []
 
     if os.path.isdir(directory):
