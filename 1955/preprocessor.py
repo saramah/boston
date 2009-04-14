@@ -43,6 +43,8 @@ def process(fromfile):
                 line = "\x97%s" %(line[2:])
             elif line.startswith(("_", "-")):
                 line = "\x97%s" %(line[1:])
+            elif line.startswith("-\x97"):
+                line = line[1:]
             if line.lower() in nhabbr:
                 prev_line += " " + line
                 processed.append(prev_line + '\n')

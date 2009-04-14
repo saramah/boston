@@ -30,7 +30,6 @@ def parse(directory):
     filepaths = sorted(map((lambda x: directory+ "/" + x), filepaths))
 
     for infile in filepaths:
-        lines.append('\n' + infile + '\n')
         #preprocess the file before we start parsing it
         preprocessed = preprocessor.process(infile)
 

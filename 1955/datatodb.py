@@ -80,7 +80,6 @@ session = Session()
 
 lines, errors, broken, died = parser.parse("select")
 
-
 for atom in lines:
     entry = Entry()
     for attr in atom:
