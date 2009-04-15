@@ -55,7 +55,7 @@ def parse(directory):
                 continue
             #stripping out death lines, these don't contain addresses
             if re.search(r'\bdied\b', line):
-                died.append({'filepath':infile, 'line_no':line_no, 'line':line.strip()})
+                died.append({'filepath':infile, 'line_no':line_no, 'line':line.strip(), 'last':last_name})
                 continue
             #some lastname headers have form "Cohig see Cohen, Cofen" etc
             #this just takes the first part of that line.
@@ -123,6 +123,7 @@ def parse(directory):
                                 lname_index += dist
                         else:
                             broken.append({'filepath':infile, 'line_no':line_no, 'line':line.strip(), 'reason':'bad jump'})
+                            continue
                     else:
                         broken.append({'filepath':infile, 'line_no':line_no, 'line':line.strip(), 'reason':'bad jump'})
                         continue

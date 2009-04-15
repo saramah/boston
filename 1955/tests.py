@@ -101,12 +101,18 @@ class TestAddresses(unittest.TestCase):
         self.assertEqual(dict_diff(helpers.parse_addr("Coglin Edw J emp United Farmers r 16 White cir st Wakefield"), {'owner':False, 'number':'16', 'street':'White Cir', 'strsuffix':'St', 'nh':'Wakefield'}), None)
 
     def testWithCompany(self):
-        self.assertEqual(dict_diff(helpers.parse_addr("\x97Sidney (Tots N Teens) children's clo r 25 Lucille"), {'owner':False, 'number':'25', 'street':'Lucille', 'strsuffix':'St', 'nh':'Boston'}), None)
+        self.assertEqual(dict_diff(helpers.parse_addr("dummy text r 25 Lucille"), {'owner':False, 'number':'25', 'street':'Lucille', 'strsuffix':'St', 'nh':'Boston'}), None)
 
 
 class TestPreprocessor(unittest.TestCase):
     def testNumber(self):
         self.assertEqual(preprocessor.process("test/test3.txt"), ["Joanne M stat niach opr City Auditing Dept r 32 Gaston Rox\n"])
+
+    def testVerboten(self):
+        self.assertEqual(preprocessor.process("test/test5.txt"), ["Saml pres-treas Collette Dress Inc r 5S Windsor Evrt\n","Vincent P jan Federal Reserve Bank h 114 Garfield av Chelsea\n"])
+
+    def testDisappear(self):
+        self.assertEqual(preprocessor.process("test/test6.txt"), ["Walt rand wid Lewis h 25 Lawrence\n", "Aaronian Lillian sis sec The Englander Co r Medford\n", "Aarons Addie wid Alex h 14 Grove\n"])
 
     def testHyphen(self):
         pass

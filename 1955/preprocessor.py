@@ -10,8 +10,9 @@ import sys
 from helpers import * 
 
 ntuple = tuple(build_dictionary("../dict/neighabbr.txt", True).keys())
-stuple = tuple(build_dictionary("../dict/streetnames.txt", False))
-
+stuple = tuple(build_dictionary("../dict/allstreets.txt", False))
+v_condense = ['rd', 'do', 'pkwy', 'ln', 'ct', 'pk', 'st', 'av', 'pl', 'pi',
+        'ter', 'dr', 'la', 'co', 'inc']
 
 def process(fromfile):
     processed = []
@@ -28,6 +29,9 @@ def process(fromfile):
             #purging room numbers
             for room in re.findall(r'(?:\brms\s\d+(?:\s|-)\d+)|(?:\brm\s+\d+)', line):
                 line = line.replace(room, "")
+            #ignoring lines with errors in them
+            if find_errors(line):
+                continue
             #stripping leading/trailing whitespace, commas, and periods
             line = line.strip()
             line = line.replace(",","")
@@ -45,6 +49,10 @@ def process(fromfile):
                 line = "\x97%s" %(line[1:])
             elif line.startswith("-\x97"):
                 line = line[1:]
+            if line.endswith("-"):
+                condense = True
+                prev_line = line
+                continue
             if line.lower() in nhabbr:
                 prev_line += " " + line
                 processed.append(prev_line + '\n')
@@ -67,6 +75,7 @@ def process(fromfile):
                 if not (start in ntuple) and not (start in stuple) and not definite and no_condense:
                     #false alarm, new entry or lname header
                     processed.append(prev_line + '\n')
+                    processed.append(line + '\n')
                 else:
                     line = condense_lines(prev_line, [line])
                     processed.append(line + '\n')
@@ -77,7 +86,7 @@ def process(fromfile):
                 condense = True
                 continue
             #a line needs to be condensed if it doesn't end with a neighborhood
-            if not line.lower().endswith(ntuple) or not line.lower().endswith(stuple):
+            if not line.lower().endswith(ntuple) and not line.lower().endswith(stuple):
                 prev_line = line
                 condense = True
                 #wait to write the line until we've condensed it
