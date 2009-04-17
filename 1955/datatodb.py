@@ -78,7 +78,8 @@ mapper(DiedLine, died_table)
 Session = sessionmaker(bind=engine)
 session = Session()
 
-lines, errors, broken, died = parser.parse("select")
+lines, errors, broken, died = parser.parse("mid")
+
 
 for atom in lines:
     entry = Entry()

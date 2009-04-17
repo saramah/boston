@@ -5,6 +5,7 @@ helpers.py
 Helper functions for parse.py and preprocessor.py, 1955.
 """
 import re
+import sys
 
 #copied constants
 LAST_NAME = 0
@@ -58,7 +59,9 @@ nhoods = build_dictionary("../dict/neighborhoods.txt", False)
 nameabbr = build_dictionary("../dict/firstabbr.txt", True)
 strabbr = build_dictionary("../dict/strabbr.txt", True)
 nhabbr = build_dictionary("../dict/neighabbr.txt", True)
-suffixes = ['st', 'pk', 'rd', 'ct', 'av', 'la', 'dr', 'ter','pl','pi','hway']
+boston_nh = build_dictionary("../dict/boston.txt", False)
+nonboston_nh = build_dictionary("../dict/nonboston.txt", True)
+suffixes = ['st', 'pk', 'rd', 'ct', 'av', 'la', 'dr', 'ter','pl','pi','hway', 'way']
  
 def build_list(path):
     """
@@ -119,17 +122,9 @@ def valid_jump(first, second):
     if first == "":
         return True
     dist_firstletter = ord(second[0].lower()) - ord(first[0].lower())
-    if dist_firstletter < 0:
+    if dist_firstletter < -1:
         return False
-    elif dist_firstletter == 1:
-        return True
-    else:
-        if len(second) < 2 or len(first) < 2:
-            return True
-        dist_secondletter = ord(second[1].lower()) - ord(first[1].lower())
-        if dist_secondletter < 0:
-            return False
-        return True
+    return True
 
 #lname_marker - list of all lastnames
 lname_marker = build_list("../dict/alllnames.txt")
@@ -138,6 +133,7 @@ lname_marker = build_list("../dict/alllnames.txt")
 #in the directory range from 1 to 40; setting a low tolerance
 #should result in relatively accurate last name progression
 WINDOW = 300
+BACK_WINDOW = 300 
 
 def distance(index, lastname):
     """
@@ -146,18 +142,23 @@ def distance(index, lastname):
     returns -1. distance does not look beyond window, currently 
     defined as %s.
     """ % (WINDOW)
-    if not lastname in lnames:
-        return -1
+    if not lastname in lnames or lastname in suffixes:
+        return 0
+    if index < BACK_WINDOW:
+        index = 0
+    else:
+        index = index - BACK_WINDOW
     point = lname_marker[index] 
     point_index = index
     diff = 0
     while point != lastname:
         if diff > WINDOW:
-            return -1
+            return 0
+            sys.exit()
         try:
             point = lname_marker[point_index]
         except IndexError:
-            return -1
+            return 0
         point_index += 1
         diff = point_index - index
     return diff

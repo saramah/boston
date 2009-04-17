@@ -20,7 +20,7 @@ def parse(directory):
     #broken - unparsed with known dirty data
     #died - unparsed, names of deceased with dates
     lines, errors, broken, died = [], [], [], []
-    last_name = lname_marker[0] 
+    last_name = lname_marker[0].capitalize() 
     #lname_index - keeps track of the index of the lastname
     #we're currently on so we don't have to recalculate it
     #every time
@@ -72,7 +72,7 @@ def parse(directory):
                     continue
                 if valid_jump(last_name, potential_lname):
                     dist = distance(lname_index, potential_lname.lower())
-                    if dist != -1:
+                    if dist != 0:
                         last_name = potential_lname
                         lname_index += dist
                     else:
@@ -114,7 +114,7 @@ def parse(directory):
                                 break
                     if valid_jump(last_name, chomp):
                         dist = distance(lname_index, chomp.lower())
-                        if dist != -1:
+                        if dist != 0:
                             #XXX neighborhood/lastname clashes
                             if chomp.lower() in nhabbr:
                                 pass
