@@ -36,7 +36,7 @@ def process(fromfile):
             line = line.strip()
             line = line.replace(",","")
             line = line.replace(".","")
-            if line.isspace() or line == "":
+            if line.isspace() or line == "" or line.isdigit():
                 continue
             #hackish; do doesn't get caught by the preprocessor as being
             #something that should be condensed

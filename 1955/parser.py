@@ -103,6 +103,8 @@ def parse(directory):
                 elif chomp.lower() in lnames:
 #            print "%d %s from\n%s" % (line_no+1, chomp, line)
                     chomp = chomp.capitalize()
+                    last_lname = last_name
+                    dist = 0
                     #if the line was misread by OCR or if the lastname is multiple
                     #words not connected by a hyphen, then grab the rest of it
                     if chomp == "Co" or chomp == "De" or chomp == "Di" or chomp == "O":
@@ -137,6 +139,11 @@ def parse(directory):
                     elif first in fnames:
                         entry["first"] = first.capitalize()
                     else:
+                        #unset last name, what we hit wasn't correct
+                        #XXX ideally we'd like to try to parse the line as a subentry,
+                        #but for now just error it
+                        last_name = last_lname
+                        lname_index -= dist
                         broken.append({'filepath':infile, 'line_no':line_no, 'line':line.strip(), 'reason':'unrecognized first name'})
                         continue
                     entry["last"] = last_name

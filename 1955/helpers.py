@@ -139,29 +139,29 @@ def distance(index, lastname):
     """
     Determines the distance to lastname in lname_marker from the
     current last name. If lastname isn't in the dictionary, distance
-    returns -1. distance does not look beyond window, currently 
-    defined as %s.
-    """ % (WINDOW)
-    if not lastname in lnames or lastname in suffixes:
+    returns 0. distance starts at back_window (currently %s) and stops 
+    looking at window (currently %s). 
+    """ % (BACK_WINDOW, WINDOW)
+    if (not lastname in lnames) or (lastname in suffixes):
         return 0
+    lower_bound = 0
     if index < BACK_WINDOW:
-        index = 0
+        lower_bound = 0
     else:
-        index = index - BACK_WINDOW
-    point = lname_marker[index] 
-    point_index = index
+        lower_bound = index - BACK_WINDOW
+    point = lname_marker[lower_bound] 
+    point_index = lower_bound
     diff = 0
-    while point != lastname:
-        if diff > WINDOW:
-            return 0
-            sys.exit()
+    while not (diff > WINDOW):
+        diff = point_index - index
+        point_index += 1
         try:
             point = lname_marker[point_index]
+            if point == lastname:
+                return diff
         except IndexError:
-            return 0
-        point_index += 1
-        diff = point_index - index
-    return diff
+            break
+    return 0
 
 def recognize(atom):
     """
@@ -170,12 +170,12 @@ def recognize(atom):
     entry, while the second is the value, and the third is the
     value for last_chomp.
     """
-    atom = atom.lower()
     if atom == "r":
         return ("ownership", "renter", OWNER)
     elif atom == "h" or atom == "b" or atom == "n":
         return ("ownership", "owner", OWNER)
-    elif atom == "wid":
+    atom = atom.lower()
+    if atom == "wid":
         return ("widowed", True, WIDOWED)
     elif atom == "mrs":
         return ("married", True, MRS)
