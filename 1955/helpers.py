@@ -41,10 +41,9 @@ def build_dictionary(path, kv):
             if not kv:
                 key = line.strip().lower()
             else:
-                line = line.split()
+                line = line.split(",")
                 key = line[0].strip().lower()
-                if len(line) > 1:
-                    val = " ".join(line[1:]).strip()
+                val = line[1].strip()
             if key not in build:
                 build[key] = val
     return build

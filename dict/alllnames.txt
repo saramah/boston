@@ -2538,7 +2538,6 @@ Allscheid
 Allshouse
 Allsop
 Allsopp
-Allston
 Allstott
 Allsup
 Allton
@@ -3879,7 +3878,6 @@ Anktom
 Anleu
 Anliker
 Ann
-Anna
 Annabel
 Annable
 Annacacis
@@ -4310,7 +4308,6 @@ Apsell
 Apsey
 Apshire
 Apstein
-Apt
 Apte
 Apthorpe
 Apu-gutierrez
@@ -9233,7 +9230,6 @@ Baxley
 Baxter
 Baxter-smith
 Baxtor
-Bay
 Bayala
 Bayanfar
 Bayani
@@ -9377,7 +9373,6 @@ Beachy
 Beack
 Beackett
 Beacom
-Beacon
 Beadel
 Beadell
 Beades
@@ -10290,7 +10285,6 @@ Belman
 Belmarez
 Belmer
 Belmir
-Belmont
 Belmonte
 Belmore
 Belnap
@@ -16586,7 +16580,6 @@ Brightharp
 Bright-imbriano
 Brightly
 Brightman
-Brighton
 Brightwell
 Brigida
 Briglia
@@ -19779,7 +19772,6 @@ Cambre
 Cambrell
 Cambria
 Cambric
-Cambridge
 Cambrils
 Cambron
 Cambronne
@@ -24591,7 +24583,6 @@ Citroni
 Cittadini
 Cittadino
 Cittell
-City
 Ciubal
 Ciubotara
 Ciuc
@@ -25112,7 +25103,6 @@ Clynes
 Cmar
 Cmiel
 Cmzett
-Co
 Coach
 Coache
 Coachman
@@ -30134,7 +30124,6 @@ Dazzi
 Dbiagio
 Dchnepp
 Ddevino
-De
 Dea
 Deabler
 Deablo
@@ -35038,7 +35027,6 @@ Dopp
 Doprato-contagero
 Dopson
 Doquette
-Dor
 Dora
 Dorado
 Dorais
@@ -37249,7 +37237,6 @@ Easom
 Eason
 Easow
 Eassa
-East
 Eastburn
 Eastcott
 Eastep
@@ -46305,7 +46292,6 @@ Gardel
 Gardell
 Gardella
 Gardemal
-Garden
 Gardenas
 Gardener
 Gardenhire
@@ -54389,7 +54375,6 @@ Hanold
 Hanono
 Hanos
 Hanouf
-Hanover
 Hanowsky
 Hanrahan
 Hanrahan-torpey
@@ -59184,10 +59169,8 @@ Hosoe
 Hosogi
 Hosoi
 Hosoya
-Hosp
 Hospedales
 Hospelhorn
-Hospital
 Hospkins
 Hoss
 Hossac
@@ -60318,7 +60301,6 @@ Hyberger
 Hych
 Hyche
 Hyczka
-Hyde
 Hyden
 Hyder
 Hydes
@@ -61970,7 +61952,6 @@ Jaloweicki
 Jama
 Jamaa
 Jamaca
-Jamaica
 Jamal
 Jamali
 Jamal-muhammad
@@ -73166,7 +73147,6 @@ Landverde
 Landwehr
 Landy
 Landzberg
-Lane
 Laneaux
 Lane-baker
 Lanehart
@@ -83082,7 +83062,6 @@ Masow
 Masrar
 Masri
 Masrur
-Mass
 Massa
 Massabni
 Massaglia
@@ -85017,6 +84996,7 @@ Mcglinchey
 Mcglinn
 Mcglocklin
 Mcglockton
+Mcgloes
 Mcglohon
 Mcgloin
 Mcgloin-tedesco
@@ -86029,7 +86009,6 @@ Mederios
 Medero
 Mederos
 Medez
-Medford
 Medghalchi
 Medgyesy
 Medhani
@@ -88287,11 +88266,9 @@ Milss
 Milstead
 Milstein
 Milster
-Milt
 Milteer
 Miltenberger
 Miltner
-Milton
 Miltz
 Milum
 Milush
@@ -94657,7 +94634,6 @@ Norstrom
 Norstrud
 Norsworthy
 Nortesano
-North
 Northam
 Northan
 Northcote
@@ -103636,7 +103612,6 @@ Policare
 Policarpe
 Policastri
 Policastro
-Police
 Polices
 Polich
 Polichetti
@@ -107188,7 +107163,6 @@ Rando
 Randol
 Randolf
 Randoll
-Randolph
 Randolph-brown
 Randolph-couture
 Randolph-lankhorst
@@ -110213,8 +110187,6 @@ Rizzuti
 Rizzuto
 Rjamar
 Rkiouak
-Rm
-Ro
 Roa
 Roach
 Roache
@@ -111889,7 +111861,6 @@ Rox
 Roxas
 Roxberry
 Roxburgh
-Roxbury
 Roxby
 Roxo
 Roxton
@@ -123073,7 +123044,6 @@ Somers
 Somers-bligh
 Somerset
 Somerto
-Somerville
 Somes
 Someya
 Somi
@@ -123496,7 +123466,6 @@ Soussan
 Soussou
 Soutbard
 Souter
-South
 Southall
 Southam
 Southand
@@ -139679,7 +139648,6 @@ Wax
 Waxlax
 Waxler
 Waxman
-Way
 Way-belmer
 Waybill
 Waybright
@@ -140517,7 +140485,6 @@ Wessman
 Wessmann
 Wessner
 Wesson
-West
 Westaby
 Westad
 Westahaus
@@ -141776,12 +141743,10 @@ Winbush
 Wincapaw
 Wince
 Wincek
-Winch
 Winchel
 Winchell
 Winchell-evarts
 Winchenbach
-Winchester
 Winckler
 Wind
 Windam
@@ -141987,7 +141952,6 @@ Winterstein
 Winterton
 Winthainstock
 Winther
-Winthrop
 Wintjen
 Wintle
 Winton

@@ -1,31 +1,33 @@
-Wm William
-Vvm William
-Thos Thomas
-Saml Samuel
-Robt Robert
-Jos Joseph
-Chas Charles
-Arth Arthur
-Patk Patrick
-Michl Michael
-Geo George
-Abr Abraham
-Benj Benjamin
-Danl Daniel
-Edw Edward
-Eug Eugene
-Fredk Frederick
-Margt Margaret
-Eliz Elizabeth
-Alex Alexander
-Alf Alfred
-Aug August
-Cath Catherine
-Jas James
-Kath Katherine
-Nathl Nathaniel
-Richd Richard
-Sol Solomon
-Steph Stephen
-Theo Theodore
-Selvvyn Selwyn
+Abr,Abraham
+Alex,Alexander
+Alf,Alfred
+Arth,Arthur
+Aug,August
+Benj,Benjamin
+Cath,Catherine
+Chas,Charles
+Danl,Daniel
+Oanl,Daniel
+0anl,Daniel
+Edw,Edward
+Eliz,Elizabeth
+Eug,Eugene
+Fredk,Frederick
+Geo,George
+Jas,James
+Jos,Joseph
+Kath,Katherine
+Margt,Margaret
+Michl,Michael
+Nathl,Nathaniel
+Patk,Patrick
+Richd,Richard
+Robt,Robert
+Saml,Samuel
+Selvvyn,Selwyn
+Sol,Solomon
+Steph,Stephen
+Theo,Theodore
+Thos,Thomas
+Vvm,William
+Wm,William

@@ -1,2 +1,2 @@
-Wash Washington
-Comlth Commonwealth
+Wash,Washington
+Comlth,Commonwealth
