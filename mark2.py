@@ -7,8 +7,8 @@ import re
 import sys
 from helpers import *
 
-ntuple = tuple(build_dictionary("../dict/allnhabbr.txt", True).keys())
-stuple = tuple(build_dictionary("../dict/allstreets.txt", False))
+ntuple = tuple(build_dictionary("dict/allnhabbr.txt", True).keys())
+stuple = tuple(build_dictionary("dict/allstreets.txt", False))
 strsuffix = ('rd','ro','pkwy','ln','ct','pk','st','sq','av','pl','pi','ter','dr','la')
 condense_prefixes = ('rd', 'do', 'pkwy', 'ln', 'ct', 'pk', 'st', 'av', 'pl', 'pi',
         'ter', 'dr', 'la', 'co', 'inc', 'ro','r','h','lane')
@@ -17,8 +17,12 @@ def process(fromfile):
     processed = []
     with open(fromfile) as infile:
         text = infile.read()
-        for room in re.findall(r'(?:\brms\s\d+(?:\s|-)\d+)|(?:\brm\s+\d+)', text):
-            line = line.replace(room, "")
+        #remove rooms
+        for room in re.findall(r'(?im)(?:\brms\s\d+(?:\s|-)\d+)|(?:\brm\s+\d+)', text):
+            text = text.replace(room, "")
+        #remove apartments
+        for apt in re.findall(r'(?im)\bAPT\s+(?:\d|A)+(?:\b|\n|\r)+', text):
+            text = text.replace(apt, "")
 
         prev_line = ""
         condense = False
