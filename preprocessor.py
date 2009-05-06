@@ -12,7 +12,7 @@ from helpers import *
 ntuple = tuple(build_dictionary("dict/allnhabbr.txt", True).keys())
 stuple = tuple(build_dictionary("dict/allstreets.txt", False))
 v_condense = ['rd', 'do', 'pkwy', 'ln', 'ct', 'pk', 'st', 'av', 'pl', 'pi',
-        'ter', 'dr', 'la', 'co', 'inc', 'ro']
+        'ter', 'dr', 'la', 'co', 'inc', 'ro', 'h','r','n','b']
 
 def process(fromfile):
     processed = []
@@ -49,14 +49,23 @@ def process(fromfile):
                 line = "\x97%s" %(line[1:])
             elif line.startswith("-\x97"):
                 line = line[1:]
+            elif line.startswith("\xc2\x97"):
+                line = line[1:]
+            elif line.startswith("\x97\x97"):
+                line = line[1:]
+            elif line.startswith("\x97 \x97"):
+                line = line[2:]
+            elif line.startswith("|"):
+                line = "\x97" + line[2:]
+            elif line.startswith("'"):
+                line = "\x97" + line[2:]
             if line.endswith("-"):
                 condense = True
                 prev_line = line
                 continue
-            #XXX reappending neighborhoods on other lines
-            if line.lower() in nhabbr:
-                prev_line += " " + line
-                processed.append(prev_line + '\n')
+            if line.lower() in nhoods:
+                if len(processed) > 0:
+                    processed[-1] = processed[-1].strip() + " " + line + '\n'
                 #we already condensed the lines right here, so we don't
                 #need to recondense them again
                 condense = False
@@ -69,8 +78,8 @@ def process(fromfile):
             if condense:
                 start = line.split()[0]
                 end = prev_line.split()[-1]
-                definite = prev_line.endswith("-") or end.isdigit()
-                no_condense = line.startswith("\x97") or start.isupper() or (start.lower() in lnames)
+                definite = prev_line.endswith("-") or end.isdigit() or (start in v_condense)
+                no_condense = line.startswith("\x97") or start.isupper()
 #                print "definite: %s nocondense: %d" % (definite, no_condense)
 #                print "neigh?: %s street?: %s" % (start in ntuple, start in stuple)
                 if not (start in ntuple) and not (start in stuple) and not definite and no_condense:

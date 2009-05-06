@@ -11,7 +11,7 @@ ntuple = tuple(build_dictionary("dict/allnhabbr.txt", True).keys())
 stuple = tuple(build_dictionary("dict/allstreets.txt", False))
 strsuffix = ('rd','ro','pkwy','ln','ct','pk','st','sq','av','pl','pi','ter','dr','la')
 condense_prefixes = ('rd', 'do', 'pkwy', 'ln', 'ct', 'pk', 'st', 'av', 'pl', 'pi',
-        'ter', 'dr', 'la', 'co', 'inc', 'ro','r','h','lane')
+        'ter', 'dr', 'la', 'co', 'inc', 'ro','r','h')
 
 def process(fromfile):
     processed = []
@@ -25,6 +25,7 @@ def process(fromfile):
             text = text.replace(apt, "")
 
         prev_line = ""
+        to_append = ""
         condense = False
         count = 0
         for line in text.split('\n'):
@@ -49,9 +50,7 @@ def process(fromfile):
             #is done
             if condense:
                 #false alarm, don't condense
-                if line.startswith("\x97") or start.isupper():
-                    processed.append(prev_line + '\n')
-                else:
+                if (not line.startswith("\x97")) or (not start.isupper()) or (not start in lnames):
                     line = condense_lines(prev_line, [line])
                 condense = False
             #we need to condense this line with the next one
@@ -59,23 +58,17 @@ def process(fromfile):
                 condense = True
                 prev_line = line
                 continue
-            if (not line.endswith(ntuple)) or (not line.endswith(stuple)) or (not line.endswith(strsuffix)):
+            if (not line.endswith(ntuple)) or (not line.endswith(stuple)) or (not line.endswith(strsuffix)) or (not line.endswith("Mass")):
                 condense = True
                 prev_line = line
                 continue
             #we need to condense it with the previous line
             start = line.split()[0]
             if start.lower() in condense_prefixes:
-#                print start
-                if start.startswith("\x97"):
-                    pass
-                elif len(processed) != 0:
-#                    print "Tacking %s on %s" % (line, processed[-1])
-                    processed[-1] = processed[-1].strip() + line + '\n'
-                    prev_line = processed[-1]
+                prev_line += " " + line
                 continue
+            processed.append(prev_line + '\n')
             prev_line = line
-            processed.append(line + '\n')
     if condense:
         processed.append(prev_line)
     return processed

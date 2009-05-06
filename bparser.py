@@ -3,7 +3,7 @@ from __future__ import with_statement
 import os, os.path
 import re
 import sys
-import mark2
+#import mark2
 import preprocessor
 
 from helpers import *
@@ -36,9 +36,12 @@ def parse(directory):
     else:
         raise NotImplementedError
 
+    lname_error_file = open("lname_errors.txt", 'w')
+
     for infile in filepaths:
         #preprocess the file before we start parsing it
-        preprocessed = mark2.process(infile)
+ #       preprocessed = mark2.process(infile)
+        preprocessed = preprocessor.process(infile)
 
         with open("out", 'a') as outfile:
             for x in preprocessed:
@@ -69,6 +72,7 @@ def parse(directory):
                     potential_lname += bit.lower()
                 potential_lname = potential_lname.capitalize()
                 if potential_lname.lower() not in lnames:
+                    lname_error_file.write("%s,%s,%s\n" % (line.strip(),line_no,infile))
                     broken.append({'filepath':infile, 'line_no':line_no, 'line':line.strip(), 'reason':'bad jump'})
                     continue
                 if valid_jump(last_name, potential_lname):
@@ -108,26 +112,27 @@ def parse(directory):
                     dist = 0
                     #if the line was misread by OCR or if the lastname is multiple
                     #words not connected by a hyphen, then grab the rest of it
-                    if chomp == "Co" or chomp == "De" or chomp == "Di" or chomp == "O":
+                    if chomp == "Co" or chomp == "De" or chomp == "Del" or chomp == "Di" or chomp == "O" or chomp == "Mac" or chomp == "Mc" or chomp == "Van":
                         plname = chomp 
                         for atom in line.split()[1:]:
                             plname += atom.lower()
                             if plname in lnames:
+                                if plname == "Vander":
+                                    continue
                                 chomp = plname
                                 break
                     if valid_jump(last_name, chomp):
                         dist = distance(lname_index, chomp.lower())
                         if dist != 0:
                             #XXX neighborhood/lastname clashes
-                            if chomp.lower() in nhabbr:
-                                pass
-                            else:
-                                last_name = chomp
-                                lname_index += dist
+                            last_name = chomp
+                            lname_index += dist
                         else:
+                            lname_error_file.write("%s,%s,%s\n" % (line.strip(),line_no,infile))
                             broken.append({'filepath':infile, 'line_no':line_no, 'line':line.strip(), 'reason':'bad jump'})
                             continue
                     else:
+                        lname_error_file.write("%s,%s,%s\n" % (line.strip(),line_no,infile))
                         broken.append({'filepath':infile, 'line_no':line_no, 'line':line.strip(), 'reason':'bad jump'})
                         continue
                     
@@ -199,7 +204,7 @@ def parse(directory):
                         else: continue
                     #we've hit the address section, finish up with everything in
                     #parse_addr
-                    elif tup[2] is OWNER or tup[2] == HOUSE_NUM or chomp.lower() in streets:
+                    elif tup[2] is OWNER or tup[2] == HOUSE_NUM: #or chomp.lower() in streets:
 #                addresses = parse_addr(line)
 #                print "dummy bit " + " ".join(line.split()[count:])
                         addresses = parse_addr("dummy bit " + " ".join(line.split()[count:]))
@@ -222,4 +227,5 @@ def parse(directory):
                 continue
             lines.append(entry)
 
+    lname_error_file.close()
     return (lines, errors, broken, died)

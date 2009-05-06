@@ -54,13 +54,13 @@ def build_dictionary(path, kv):
 lnames = build_dictionary("dict/alllnames.txt", False)
 fnames = build_dictionary("dict/firstnames.txt", False)
 streets = build_dictionary("dict/allstreets.txt", False)
-nhoods = build_dictionary("dict/neighborhoods.txt", False)
+states = build_dictionary("dict/states.txt", True)
 nameabbr = build_dictionary("dict/firstabbr.txt", True)
 strabbr = build_dictionary("dict/strabbr.txt", True)
-nhabbr = build_dictionary("dict/allnhabbr.txt", True)
+nhoods = build_dictionary("dict/allnhabbr.txt", True)
 boston_nh = build_dictionary("dict/boston.txt", False)
 nonboston_nh = build_dictionary("dict/nonboston.txt", True)
-suffixes = ['st', 'pk', 'rd', 'ct', 'av', 'la', 'dr', 'ter','pl','pi','hway', 'way']
+suffixes = ['st', 'pk', 'rd', 'ct', 'av', 'la', 'dr', 'ter','pl','pi','hway', 'way', 'blvd']
  
 def build_list(path):
     """
@@ -189,16 +189,15 @@ def recognize(atom):
         return ("first", atom.capitalize(), INITIAL)
     elif atom.isdigit():
         return ("number", atom, HOUSE_NUM)
-    elif atom in ('rd', 'ct', 'st', 'pk', 'av', 'ave', 'pl', 'pi', 'sq',
-                  'ter', 'dr', 'la', 'ln', 'hway','ro'):
+    elif atom in suffixes:
         remap = {'av': 'Ave', 'la': 'Ln', 'pi': 'Pl','ro':'Rd'}
         if atom in remap:
             atom = remap[atom]
         else:
             atom = atom.capitalize()
         return ("strsuffix", atom, STREET_SUFFIX)
-    elif atom in nhabbr:
-        return ("nh", nhabbr[atom], NH)
+    elif atom in nhoods:
+        return ("nh", nhoods[atom], NH)
     else:
         return None
 
@@ -210,6 +209,7 @@ def translate(number):
     number = number.replace("l","1")
     number = number.replace("I","1")
     number = number.replace("S","5")
+    number = number.replace("B","8")
     return number
 
 
@@ -233,12 +233,17 @@ def parse_addr(line):
         word = words[pos]
         word_prev = words[pos-1]
         #print 'w [%s] pos [%s] res [%s]' % (word, pos, result)
-        if word in nhabbr:
+
+        if word in states:
+            if len(result.keys()) == 0:
+                result['street'] = word
+
+        if word in nhoods:
             # If we find a NH before a street address,
             # it belongs to the business street.
             if 'street' in result:
                 prefix = 'b_'
-            result[prefix+'nh'] = nhabbr[words[pos]]
+            result[prefix+'nh'] = nhoods[words[pos]]
         elif word in suffixes:
             # If we find a suffix before a street address,
             # it belongs to the business street.

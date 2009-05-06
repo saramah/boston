@@ -1,16 +1,11 @@
 import re
 
-infile = open("1955streets.txt")
-outfile = open("1955streetsout.txt", 'w')
+infile = open("suffolk-streets.txt")
+outfile = open("outsuff.txt", 'w')
 for line in infile:
     line = line.strip()
     if line.isspace():
         continue
-    if line.isdigit():
-        continue
-    if re.search(r'\d+-\d+', line):
-        continue
-    print line
-    outfile.write(line + '\n')
+    outfile.write(" ".join(line.split()[:len(line.split())-1]) + '\n')
 infile.close()
 outfile.close()
