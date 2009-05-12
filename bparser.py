@@ -116,7 +116,7 @@ def parse(directory):
                         plname = chomp 
                         for atom in line.split()[1:]:
                             plname += atom.lower()
-                            if plname in lnames:
+                            if plname.lower() in lnames:
                                 if plname == "Vander":
                                     continue
                                 chomp = plname

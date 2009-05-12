@@ -15,10 +15,12 @@ Eug,Eugene
 Fredk,Frederick
 Geo,George
 Jas,James
+Jamea,James
 Jos,Joseph
 Kath,Katherine
 Margt,Margaret
 Michl,Michael
+Msry,Mary
 Nathl,Nathaniel
 Patk,Patrick
 Richd,Richard
