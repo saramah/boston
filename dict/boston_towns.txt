@@ -1,0 +1,17 @@
+Alls,Allston
+Br,Brighton
+Chsn,Charlestown
+Dor,Dorchester
+Eb,East Boston
+Faneuil Hall Square,Faneuil Hall Square
+Hp,Hyde Park
+Jp,Jamaica Plain
+Mat,Mattapan
+Rox,Roxbury
+Box,Roxbury
+Ros,Roslindale
+Revr,Revere
+Sb,South Boston
+Wol,Wollaston
+Wr,West Roxbury
+Vvr,West Roxbury

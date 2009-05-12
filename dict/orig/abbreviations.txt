@@ -1,0 +1,335 @@
+193
+ABBREVIATIONS
+acct ...... accountant
+adj ...........adjuster
+admn . . . administrator
+or administration
+adv ........advertising
+agcy ......... agency
+agrl ...... agriculture
+agt ............ agent
+al .............. alley
+Am ........ American
+appr ...... apprentice
+apts ..... apartments
+archt ....... architect
+asmblr ..... assembler
+assoc ....... associate
+asst ........ assistant
+atndt ....... attendant
+atty ......... attorney
+and .......... auditor
+av ............ avenue
+bgemn . . . baggageman
+bkbndr   . . . bookbinder
+bkpr .......bookkeeper
+bldr...........builder
+blk ............ block
+blksmith . . . blacksmith
+blrmkr  . . . boilermaker
+blvd ........ boulevard
+bmo   business machine
+operator
+br ............ branch
+brklyr ..... bricklayer
+hrkmn ..... brake in an
+bur .......... bureau
+CSP ........ Christian
+Science Practitioner
+cabtmkr   . cabinetmaker
+carp ........ carpenter
+cash ......... cashier
+chauf ..... chauffeur
+chern ..... chemist or
+chemical
+chf ............ chief
+chkr..........checker
+clr ............. circle
+civ ............. civil
+elk ............. cleric
+cln . cleaning or cleaner
+clo ...........clothing
+collr ....... collector
+comi ...... commercial
+comn......commission
+comnr . . . commissioner
+COmp ...... compositor
+condr ...... conductor
+confr .... confectioner
+constn ...construction
+eontr ...... contractor
+cor ............ corner
+COrrea  . . correspondent
+ct .............. court
+custdn ..... custodian
+ctr............. cutter
+del .......... delivery
+dep............deputy
+dietn ....... dietitian
+dir ........... director
+dispr ...... dispatcher
+dist .......... district
+• listr ...... distributor
+div............division
+dir ............ dealer
+dmnstr   . demonstrator
+do.......ditto or same
+dr .............. drive
+drftsmn .... draftsman
+drsmkr .... dressmaker
+e or E ........... East
+educ........education
+elec ......electrical or
+electric
+electn......electrician
+electro  . . . electrotyper
+elev..........elevator
+emp ........ employee
+eng ......... engineer
+engr.........engraver
+equip ...... equipment
+es .......... east side
+exam ....... examiner
+exch ....... exchange
+exp ...........express
+fcty...........factory
+fdry ......... foundry
+Fed .......... Federal
+fl .............. floor
+fnshr ........ finisher
+formn........foreman
+forwn ..... forewoman
+frt ............ freight
+ft ............... foot
+ftr ............. fitter
+furn ....... furniture
+furngs   . . . furnishings
+gdnr ........ gardener
+gds.............goods
+genl...........general
+geol ........ geologisl
+govt ...... government
+gro ........... grocer
+h ........ householder
+htg .......... heating
+hdW ........ hardware
+hlpr ........... helper
+hndlr ......... handler
+hosp..........hospital
+hq .....headquarters
+hsekpr .... housekeeper
+htg .......... heating
+Hts ....... Heights
+implts  .... implements
+ins ......... Insurance
+insp ..... Inspector or
+inspection
+instr....... . instructor
+int dec ....... interior
+decorator
+int rev Internal revenue
+inv ....... investment
+jan ........... janitor
+jwlr .......... jeweler
+kpr........... keeper
+la ............. lane
+lab .......... laborer
+laby ...... laboratory
+lhr .......... lumber
+llbri] ....... librarian
+lino ....... linotype
+litho   .... lithographer
+Indrs ...... laundress
+Indry ........ laundry
+ltd ........... limited
+lwyr .......... lawyer
+mach.....machinist or
+machine
+mdse ..... merchandise
+mech ...... mechanic
+or mechanical
+med ...... medical
+Met Metropolitan
+meter Tdr meter reader
+mfg .... manufacturing
+mfr   .... manufacturer
+mgr..........manager
+mkr .......... maker
+mkt .......... market
+mldr .......... molder
+mlnr ........ milliner
+mn .............. man
+mono........monotype
+msngr ..... messenger
+mstr .......... master
+mtce   .... maintenance
+mtge ........ mortgage
+mtr motorman or motor
+mus............music
+mut .........mutual
+n or N ..........North
+Natl ........ National
+ne..........northeast
+ns ......... north side
+nw .........northwest
+ofc.............office
+opp .......... opposite
+opr..........operator
+optn ......... optician
+optom  .... optometrist
+osteo..... osteopath
+PS . . .     Public School
+pass ..... passenger
+pharm . . pharmacist
+photog .. photographer
+phys ....... physician
+pk ............ park
+pkr .......... packer
+pkwy ....... parkway
+pi .............. place
+plmb ......plumber or
+plumbing
+plshr ........ polisher
+plstr ....... plasterer
+pntr ......... painter
+pres ....... president
+prfrdr .... proofreader
+prln ........ principal
+pri\ ........ private
+prntr ........ printer
+prod ......... produce
+prof.........professor
+prsfdr   ...press feeder
+prsmn .......pressman
+prsr .......... presser
+ptrnmkr patternmaker
+pub.......public
+publ   ....   publisher or
+publishing
+purch  . purchasing
+r   ... .resides or rooms
+R.............room
+RC . Roman Catholic
+RP  .  .  Rural Delivery
+rd ............. road
+rdr............ reader
+real est ... real estate
+Tec ......... receiving
+recpt  .... receptionist
+refgr .. refrigeration or
+refrigerator
+rep  .... representative
+repr .... repairman or
+repair
+restr ...... restaurant
+ret ............ retail
+Rev ........ Reverend
+rm............. room
+s or S...........South
+san..........sanitary
+Sav ......... Savings
+sch ......... . . school
+se .......... southeast
+sec..........secretary
+serv...........service
+ship ........ shipping
+sht mtl.....sheet metal
+sis ............. sales
+smstrs  .... seamstress
+soc............society
+solr ......... solicitor
+spl............special
+sq ............ square
+srtr ............ sorter
+ss ......... south side
+sta ........... station
+sta eng ............
+. .stationary engineer
+stat  . . .  statistician or
+statistical
+sten   .... stenographer
+stereo   .... stereotyper
+stge ........ storage
+stmftr   .... steamfitter
+str............. setter
+studt ......... student
+stvdr ...... stevedore
+sup............supply
+supt .... superintendent
+supvr ..... supervisor
+sw ........ southwest
+9Wtchmn   . . switchman
+sys........... system
+tehr .......... teacher
+tech ....... technician
+tel ......... telephone
+teleg ....... telegraph
+telev ...... television
+ter ........... terrace
+tmkpr   .... timekeeper
+tndr.......... tender
+tob ........... tobacco
+trans . . . transportation
+tr.iv ........ traveling
+trnmn ..... trainman
+treas ...... treasurer
+trmr ......... trimmer
+t -1 r ........... tester
+twp ....... township
+tvp .......... typist
+USA ____ TT S Army
+CSAF    TTS  Air Force
+USCG ........
+..US Coast Guard
+USMG ........
+... US Marine Corps
+USN ...... US Navy
+undwrtr underwriter
+Univ ..... University
+uphol ..... upholsterer
+vet ........ veterinary
+vulc ...... vulcanizer
+w or W ....... West
+whol ....... wholesale
+whsemn warehouseman
+wid............widow
+wkr .......... worker
+wks ........... works
+wldr .......... welder
+ws..........west side
+wtchmn.....watchman
+ydmn........yardman
+ydmstr  ... yardmaster
+ABBREVIATIONS OF GIVEN NAMES
+Abr.........Abraham
+Alex........Alexander
+A If ............ Alfred
+Arth .......... Arthur
+Aug...........August
+Benj........Benjamin
+Cath........Catherine
+Chas..........Charles
+Danl .......... Daniel
+Edw ..........Edward
+Eliz ........ Elizabeth
+Eug .......... Eugene
+Fredk ...... Frederick
+Geo ........... George
+Jas ............ James
+Jos............Joseph
+Kath........Katherine
+Margt ...... Margaret
+Michl ........ Michael
+Nathl ...... Nathaniel
+Patk..........Patrick
+Richd ........ Richard
+Robt .......... Robert
+Saml..........Samuel
+Sol.......... Solomon
+Steph ........ Stephen
+Theo........Theodore
+Thos..........Thomas
+Wm..........William
+1-1-50
+
+boston city directory (1955)

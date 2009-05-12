@@ -1,0 +1,51 @@
+Arl,Arlington
+Aub,Auburndale
+Belm,Belmont
+Blmt,Belmont
+Bline,Brookline
+B'line,Brookline
+Brookline,Brookline
+Beverly,Beverly
+Box,Roxbury
+Bedford,Bedford
+Beachmont,Beachmont
+Camb,Cambridge
+Ch,Chestnut Hill
+CH,Chestnut Hill
+Cohasset,Cohasset
+Chel,Chelsea
+Ded,Dedham
+Evrt,Everett
+Fairm't,Fairmont
+Fram,Framingham
+Hingham,Hingham
+Lex,Lexington
+Lynn,Lynn
+Mald,Malden
+Maid,Malden
+Marlboro,Marlboro
+Med,Medford
+Melr,Melrose
+Milt,Milton
+Needham,Needham
+Newt,Newton
+N'ville,Newtonville
+Nvl,Newtonville
+Quincy,Quincy
+Revr,Revere
+Readv,Readville
+Rv,Readville
+Shr,Sharon
+Somv,Somerville
+Swmsct,Swampscott
+Waban,Waban
+Walth,Waltham
+Weston,Weston
+Wlsly,Wellesley
+WH,Wellesley Hills
+Winch,Winchester
+Winthp,Winthrop
+Wol,Wollaston
+W'town,Watertown
+Wtown,Watertown
+W Newton,West Newton
