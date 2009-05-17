@@ -112,7 +112,7 @@ def parse(directory):
                     dist = 0
                     #if the line was misread by OCR or if the lastname is multiple
                     #words not connected by a hyphen, then grab the rest of it
-                    if chomp == "Co" or chomp == "De" or chomp == "Del" or chomp == "Di" or chomp == "O" or chomp == "Mac" or chomp == "Mc" or chomp == "Van":
+                    if chomp == "Co" or chomp == "De" or chomp == "Del" or chomp == "Des" or chomp == "Di" or chomp == "La" or chomp == "Le" or chomp == "O" or chomp == "Mac" or chomp == "Mi" or chomp == "Mc" or chomp == "Van":
                         plname = chomp 
                         for atom in line.split()[1:]:
                             plname += atom.lower()

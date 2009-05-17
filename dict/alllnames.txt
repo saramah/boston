@@ -32471,7 +32471,6 @@ Derx
 Dery
 Deryugina
 Derzhavets
-Des
 Desa
 Desabaye
 Desadier
@@ -34663,6 +34662,7 @@ Dolby
 Dolce
 Dolcetto
 Dolch
+Dolci
 Dolcine
 Dold
 Dolden
@@ -69607,6 +69607,7 @@ Korczynski
 Kordalski
 Kordan
 Kordas
+Kordaszewski
 Kordau
 Kordhishti
 Kordiak
@@ -74532,7 +74533,6 @@ Lazzouni
 Lbanez
 Lbartino
 Lbidapo
-Le
 Lea
 Leab
 Leabman
@@ -87713,7 +87713,6 @@ Mhanna
 Mhaya
 Mhlaba
 Mhoon
-Mi
 Mia
 Miades
 Miah
