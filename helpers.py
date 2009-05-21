@@ -170,9 +170,9 @@ def recognize(atom):
     value for last_chomp.
     """
     if atom == "r":
-        return ("ownership", "renter", OWNER)
+        return ("owner", "renter", OWNER)
     elif atom == "h" or atom == "b" or atom == "n":
-        return ("ownership", "owner", OWNER)
+        return ("owner", "owner", OWNER)
     atom = atom.lower()
     if atom == "wid" or atom == "wio":
         return ("widowed", True, WIDOWED)
@@ -220,7 +220,7 @@ def parse_addr(line):
     this function will return two addresses: a business address
     and a residential address.
     """
-    words = map(str.lower, line.split())
+    words = line.split()
     pos = len(words) - 1
     prefix = ''
     lookbehind = ('', 0)
@@ -232,19 +232,18 @@ def parse_addr(line):
     while pos>0:
         word = words[pos]
         word_prev = words[pos-1]
-        #print 'w [%s] pos [%s] res [%s]' % (word, pos, result)
+        print 'w [%s] pos [%s] res [%s]' % (word, pos, result)
 
-        if word in states:
+        if word.lower() in states:
             if len(result.keys()) == 0:
                 result['street'] = word
-
-        if word in nhoods:
+        if word.lower() in nhoods:
             # If we find a NH before a street address,
             # it belongs to the business street.
             if 'street' in result:
                 prefix = 'b_'
-            result[prefix+'nh'] = nhoods[words[pos]]
-        elif word in suffixes:
+            result[prefix+'nh'] = nhoods[words[pos].lower()]
+        elif word.lower() in suffixes:
             # If we find a suffix before a street address,
             # it belongs to the business street.
             if 'street' in result:
@@ -263,7 +262,7 @@ def parse_addr(line):
             start = 2 if (pos-4)<2 else pos-4
             for i in range(start, pos+1):
                 cur_match = ' '.join(words[i:pos+1])
-                if cur_match in streets or cur_match in strabbr:
+                if cur_match.lower() in streets or cur_match.lower() in strabbr:
                     if not prefix and not 'street' in result:
                         key = 'street'
                     elif 'b_street' not in result:
@@ -271,9 +270,9 @@ def parse_addr(line):
                     else:
                         continue
                     pos = i
-                    if cur_match in strabbr:
-                        cur_match = strabbr[cur_match]
-                    if words[i-1] in ('n', 's', 'e', 'w'):
+                    if cur_match.lower() in strabbr:
+                        cur_match = strabbr[cur_match.lower()]
+                    if words[i-1].lower() in ('n', 's', 'e', 'w'):
                         cur_match = "%s %s" % (words[i-1].capitalize(),
                                                cur_match)
                         pos -= 1
